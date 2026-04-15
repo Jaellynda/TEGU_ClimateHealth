@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { SCHOOLS, SENSOR_READINGS, getRiskColor, getVulnerabilityColor, getPM25Level } from '@/lib/schpData';
-import { AlertTriangle, Users, Thermometer, Wind, Activity } from 'lucide-react';
-
-const { BaseLayer } = LayersControl;
+import { SCHOOLS, SENSOR_READINGS, getRiskColor, getVulnerabilityColor, getPM25Level, DISPATCH_LOGS } from '@/lib/schpData';
+import { AlertTriangle, Users, Thermometer, Wind, Activity, MessageCircle, Layers } from 'lucide-react';
+import HeatmapLayer from '@/components/schp/HeatmapLayer';
+import WhatsAppNotifier from '@/components/schp/WhatsAppNotifier';
 
 const LAYERS = [
   { id: 'pm25', label: 'Air Quality (PM2.5)' },
@@ -48,10 +48,11 @@ function StatCard({ icon: Icon, label, value, color }) {
 
 export default function LiveMap() {
   const [activeLayer, setActiveLayer] = useState('pm25');
+  const [showHeatmap, setShowHeatmap] = useState(true);
   const [selectedSchool, setSelectedSchool] = useState(null);
+  const [whatsappDispatch, setWhatsappDispatch] = useState(null);
   const [tick, setTick] = useState(0);
 
-  // Simulate live data refresh
   useEffect(() => {
     const interval = setInterval(() => setTick(t => t + 1), 30000);
     return () => clearInterval(interval);
@@ -73,8 +74,8 @@ export default function LiveMap() {
         <StatCard icon={Thermometer} label="Peak Heat Index" value="44.5°C" color="#E67E22" />
       </div>
 
-      {/* Layer Selector */}
-      <div className="flex flex-wrap gap-2">
+      {/* Controls row */}
+      <div className="flex flex-wrap gap-2 items-center">
         {LAYERS.map(l => (
           <button
             key={l.id}
@@ -88,6 +89,22 @@ export default function LiveMap() {
             {l.label}
           </button>
         ))}
+
+        {/* Heatmap toggle */}
+        {activeLayer !== 'vulnerability' && (
+          <button
+            onClick={() => setShowHeatmap(h => !h)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all border ${
+              showHeatmap
+                ? 'bg-purple-600 text-white border-purple-600'
+                : 'bg-white text-muted-foreground border-border hover:border-purple-400'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            Interpolated Heatmap
+          </button>
+        )}
+
         <div className="ml-auto flex items-center gap-1.5 text-[11px] text-green-600 font-medium bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">
           <Activity className="w-3.5 h-3.5 animate-pulse" />
           AirQo Feed Active
@@ -98,7 +115,7 @@ export default function LiveMap() {
         {/* Map */}
         <div className="lg:col-span-2 rounded-xl overflow-hidden border border-border shadow-md" style={{ height: '460px' }}>
           <MapContainer
-            center={[0.35, 32.65]}
+            center={[0.38, 32.85]}
             zoom={9}
             style={{ height: '100%', width: '100%' }}
             zoomControl={true}
@@ -107,6 +124,16 @@ export default function LiveMap() {
               attribution='&copy; OpenStreetMap'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+
+            {/* IDW Interpolated Heatmap */}
+            {showHeatmap && activeLayer !== 'vulnerability' && (
+              <HeatmapLayer
+                readings={SENSOR_READINGS}
+                schools={SCHOOLS}
+                activeLayer={activeLayer}
+              />
+            )}
+
             {SCHOOLS.map(school => {
               const reading = readingMap[school.id];
               const color = getMarkerColor(school, reading, activeLayer);
@@ -153,36 +180,68 @@ export default function LiveMap() {
           {SCHOOLS.map(school => {
             const reading = readingMap[school.id];
             const color = getMarkerColor(school, reading, activeLayer);
+            const dispatch = DISPATCH_LOGS.find(d => d.school_id === school.id);
             return (
-              <button
-                key={school.id}
-                onClick={() => setSelectedSchool(school)}
-                className="w-full text-left bg-white rounded-lg p-3 border border-border hover:border-[#1B4F72] transition-all shadow-sm"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[12px] font-semibold text-foreground truncate">{school.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{school.district}</p>
+              <div key={school.id} className="bg-white rounded-lg border border-border shadow-sm overflow-hidden">
+                <button
+                  onClick={() => setSelectedSchool(school)}
+                  className="w-full text-left p-3 hover:bg-muted/30 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] font-semibold text-foreground truncate">{school.name}</p>
+                      <p className="text-[11px] text-muted-foreground">{school.district}</p>
+                    </div>
+                    <span className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: color }} />
                   </div>
-                  <span className="w-3 h-3 rounded-full flex-shrink-0 mt-0.5" style={{ backgroundColor: color }} />
-                </div>
-                {reading && (
-                  <div className="mt-2 flex gap-3 text-[11px] text-muted-foreground">
-                    <span>PM2.5: <strong style={{ color }}>{reading.pm25}</strong></span>
-                    <span>Hi: <strong>{reading.heat_index}°C</strong></span>
-                    <span><Users className="w-3 h-3 inline" /> {school.student_population}</span>
-                  </div>
+                  {reading && (
+                    <div className="mt-2 flex gap-3 text-[11px] text-muted-foreground">
+                      <span>PM2.5: <strong style={{ color }}>{reading.pm25}</strong></span>
+                      <span>Hi: <strong>{reading.heat_index}°C</strong></span>
+                      <span><Users className="w-3 h-3 inline" /> {school.student_population}</span>
+                    </div>
+                  )}
+                  {reading?.status === 'Red Alert' && (
+                    <div className="mt-1.5"><AlertBadge status={reading.status} /></div>
+                  )}
+                </button>
+                {/* WhatsApp alert button for schools with dispatch orders */}
+                {dispatch && (
+                  <button
+                    onClick={() => setWhatsappDispatch(whatsappDispatch?.school_id === school.id ? null : dispatch)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-[11px] font-semibold border-t border-border transition-colors ${
+                      whatsappDispatch?.school_id === school.id
+                        ? 'bg-[#25D366] text-white'
+                        : 'bg-green-50 text-green-700 hover:bg-green-100'
+                    }`}
+                  >
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    Notify Admin via WhatsApp
+                  </button>
                 )}
-                {reading?.status === 'Red Alert' && (
-                  <div className="mt-1.5">
-                    <AlertBadge status={reading.status} />
-                  </div>
-                )}
-              </button>
+              </div>
             );
           })}
         </div>
       </div>
+
+      {/* WhatsApp Notifier Panel */}
+      {whatsappDispatch && (
+        <WhatsAppNotifier
+          dispatch={whatsappDispatch}
+          onClose={() => setWhatsappDispatch(null)}
+        />
+      )}
+
+      {/* Heatmap legend note */}
+      {showHeatmap && activeLayer !== 'vulnerability' && (
+        <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 flex items-center gap-3 text-[12px] text-purple-800">
+          <Layers className="w-4 h-4 text-purple-600 flex-shrink-0" />
+          <span>
+            <strong>Interpolated Heatmap active</strong> — IDW spatial interpolation estimates {activeLayer === 'pm25' ? 'PM2.5 air quality' : 'heat index'} across the full Kampala–Jinja corridor beyond the 8 sensor points. Darker red zones = highest interpolated risk.
+          </span>
+        </div>
+      )}
 
       {/* Legend */}
       <div className="bg-white rounded-xl p-4 border border-border shadow-sm">
