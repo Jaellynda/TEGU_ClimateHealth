@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DISPATCH_LOGS } from '@/lib/schpData';
 import { useAdminAuth } from '@/lib/authContext';
-import { Package, CheckCircle, Clock, Truck, AlertTriangle, ChevronDown, ChevronUp, Lock, Brain } from 'lucide-react';
+import {
+  Package, CheckCircle, Clock, Truck, ChevronDown, ChevronUp,
+  Lock, Brain, Send, MapPin
+} from 'lucide-react';
 
 const STATUS_CONFIG = {
-  Pending: { color: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', icon: Clock },
-  Dispatched: { color: 'text-blue-700', bg: 'bg-blue-100', border: 'border-blue-200', icon: Truck },
-  Delivered: { color: 'text-green-700', bg: 'bg-green-100', border: 'border-green-200', icon: CheckCircle },
-  Acknowledged: { color: 'text-purple-700', bg: 'bg-purple-100', border: 'border-purple-200', icon: CheckCircle },
+  Pending:     { color: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', icon: Clock },
+  Dispatched:  { color: 'text-blue-700',   bg: 'bg-blue-100',   border: 'border-blue-200',   icon: Truck },
+  Delivered:   { color: 'text-green-700',  bg: 'bg-green-100',  border: 'border-green-200',  icon: CheckCircle },
+  Acknowledged:{ color: 'text-purple-700', bg: 'bg-purple-100', border: 'border-purple-200', icon: CheckCircle },
 };
 
 const PRIORITY_CONFIG = {
   Critical: { badge: 'bg-red-100 text-red-700 border-red-200' },
-  High: { badge: 'bg-orange-100 text-orange-700 border-orange-200' },
-  Medium: { badge: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+  High:     { badge: 'bg-orange-100 text-orange-700 border-orange-200' },
+  Medium:   { badge: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
 };
 
-function DispatchCard({ dispatch }) {
+function DispatchCard({ dispatch, onStatusChange }) {
   const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const status = STATUS_CONFIG[dispatch.status] || STATUS_CONFIG.Pending;
   const priority = PRIORITY_CONFIG[dispatch.priority] || PRIORITY_CONFIG.Medium;
   const StatusIcon = status.icon;
+
+  const handleAction = async (newStatus) => {
+    setLoading(true);
+    const timestamp = new Date().toISOString();
+    const dispatchedBy = newStatus === 'Dispatched'
+      ? `Health Worker · ${new Date().toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT`
+      : dispatch.dispatched_by;
+    await onStatusChange(dispatch.id, { status: newStatus, dispatched_by: dispatchedBy, updated_at: timestamp });
+    setLoading(false);
+  };
 
   return (
     <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
@@ -52,11 +69,41 @@ function DispatchCard({ dispatch }) {
 
         {/* Supplies */}
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {dispatch.supplies.map((s, i) => (
+          {dispatch.supplies?.map((s, i) => (
             <span key={i} className="text-[11px] bg-muted text-muted-foreground px-2.5 py-1 rounded-full border border-border">
               {s}
             </span>
           ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-3 flex gap-2">
+          {dispatch.status === 'Pending' && (
+            <button
+              disabled={loading}
+              onClick={() => handleAction('Dispatched')}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[12px] font-semibold transition-colors disabled:opacity-50"
+            >
+              <Send className="w-3.5 h-3.5" />
+              {loading ? 'Updating...' : 'Mark as Dispatched'}
+            </button>
+          )}
+          {dispatch.status === 'Dispatched' && (
+            <button
+              disabled={loading}
+              onClick={() => handleAction('Delivered')}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-[12px] font-semibold transition-colors disabled:opacity-50"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              {loading ? 'Updating...' : 'Confirm Delivery'}
+            </button>
+          )}
+          {dispatch.status === 'Delivered' && (
+            <div className="flex items-center gap-1.5 text-[12px] text-green-700 font-medium">
+              <CheckCircle className="w-4 h-4" />
+              Delivered & logged · {dispatch.dispatched_by}
+            </div>
+          )}
         </div>
       </div>
 
@@ -74,9 +121,11 @@ function DispatchCard({ dispatch }) {
             <p className="text-[12px] text-orange-900">{dispatch.morbidity_forecast}</p>
           </div>
           <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 pt-1">
-            <span>ID: <code className="bg-muted px-1 rounded font-mono">{dispatch.id.toUpperCase()}</code></span>
+            <span>ID: <code className="bg-muted px-1 rounded font-mono">{dispatch.id?.toUpperCase()}</code></span>
             <span>By: {dispatch.dispatched_by}</span>
-            <span>Time: {new Date(dispatch.created_date).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
+            {dispatch.created_date && (
+              <span>Created: {new Date(dispatch.created_date).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
+            )}
           </div>
         </div>
       )}
@@ -87,9 +136,43 @@ function DispatchCard({ dispatch }) {
 export default function DispatchLog() {
   const { isAdmin, login } = useAdminAuth();
   const [filter, setFilter] = useState('All');
+  const queryClient = useQueryClient();
+
+  // Seed DB from mock data on first load if empty
+  const { data: dbLogs = [], isLoading } = useQuery({
+    queryKey: ['dispatchLogs'],
+    queryFn: async () => {
+      const existing = await base44.entities.DispatchLog.list('-created_date', 50);
+      if (existing.length === 0) {
+        // Seed from mock data
+        await base44.entities.DispatchLog.bulkCreate(DISPATCH_LOGS.map(d => ({
+          school_id: d.school_id,
+          school_name: d.school_name,
+          district: d.district,
+          trigger_type: d.trigger_type,
+          trigger_value: d.trigger_value,
+          supplies: d.supplies,
+          status: d.status,
+          xai_reason: d.xai_reason,
+          morbidity_forecast: d.morbidity_forecast,
+          priority: d.priority,
+          dispatched_by: d.dispatched_by,
+        })));
+        return base44.entities.DispatchLog.list('-created_date', 50);
+      }
+      return existing;
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.DispatchLog.update(id, data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dispatchLogs'] }),
+  });
 
   const statusFilters = ['All', 'Pending', 'Dispatched', 'Delivered'];
-  const filtered = filter === 'All' ? DISPATCH_LOGS : DISPATCH_LOGS.filter(d => d.status === filter);
+  const filtered = filter === 'All' ? dbLogs : dbLogs.filter(d => d.status === filter);
+
+  const countByStatus = (s) => dbLogs.filter(d => d.status === s).length;
 
   if (!isAdmin) {
     return (
@@ -100,10 +183,7 @@ export default function DispatchLog() {
           </div>
           <h2 className="text-[20px] font-bold text-[#1B4F72] mb-2">Admin Access Required</h2>
           <p className="text-muted-foreground text-[13px] mb-5">This view is restricted to verified health workers and district administrators.</p>
-          <button
-            onClick={login}
-            className="bg-[#E67E22] hover:bg-[#D35400] text-white font-semibold px-6 py-2.5 rounded-lg transition-colors"
-          >
+          <button onClick={login} className="bg-[#E67E22] hover:bg-[#D35400] text-white font-semibold px-6 py-2.5 rounded-lg transition-colors">
             Login as Health Worker
           </button>
         </div>
@@ -124,10 +204,10 @@ export default function DispatchLog() {
         </p>
         <div className="flex flex-wrap gap-3 mt-3">
           {[
-            { label: 'Total Orders', value: DISPATCH_LOGS.length },
-            { label: 'Pending', value: DISPATCH_LOGS.filter(d => d.status === 'Pending').length },
-            { label: 'Dispatched', value: DISPATCH_LOGS.filter(d => d.status === 'Dispatched').length },
-            { label: 'Delivered', value: DISPATCH_LOGS.filter(d => d.status === 'Delivered').length },
+            { label: 'Total Orders', value: dbLogs.length },
+            { label: 'Pending', value: countByStatus('Pending') },
+            { label: 'Dispatched', value: countByStatus('Dispatched') },
+            { label: 'Delivered', value: countByStatus('Delivered') },
           ].map(({ label, value }) => (
             <div key={label} className="bg-white/20 rounded-lg px-3 py-1.5">
               <span className="text-[11px] opacity-80">{label}: </span>
@@ -140,24 +220,29 @@ export default function DispatchLog() {
       {/* Filters */}
       <div className="flex gap-2 flex-wrap">
         {statusFilters.map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
+          <button key={f} onClick={() => setFilter(f)}
             className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
               filter === f ? 'bg-[#1B4F72] text-white' : 'bg-white text-muted-foreground border border-border hover:border-[#1B4F72]'
-            }`}
-          >
+            }`}>
             {f}
           </button>
         ))}
       </div>
 
       {/* Cards */}
-      <div className="space-y-3">
-        {filtered.map(dispatch => (
-          <DispatchCard key={dispatch.id} dispatch={dispatch} />
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="text-center py-12 text-muted-foreground text-[13px]">Loading dispatch orders...</div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(dispatch => (
+            <DispatchCard
+              key={dispatch.id}
+              dispatch={dispatch}
+              onStatusChange={(id, data) => updateMutation.mutateAsync({ id, data })}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
