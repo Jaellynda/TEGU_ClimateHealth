@@ -11,6 +11,7 @@ const PAGE_META = {
   '/forecasts': { title: 'Predictive Morbidity Forecasts', subtitle: 'Climate-sensitive disease projection · 48-hour window' },
   '/dispatch': { title: 'Anticipatory Action Log', subtitle: 'Admin · Dispatch Orders & Supply Chain Status' },
   '/district-reports': { title: 'District Health Reports', subtitle: 'Admin · DHIS2-Ready Export · Uganda MOH Integration' },
+  '/trends': { title: '30-Day Trend Analysis', subtitle: 'Historical PM2.5 & Heat Index patterns · NGO & policy reporting' },
 };
 
 export default function AppLayout() {

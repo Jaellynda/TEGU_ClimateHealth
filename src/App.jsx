@@ -17,6 +17,7 @@ import AIPredictor from './pages/AIPredictor';
 import MorbidityForecasts from './pages/MorbidityForecasts';
 import DispatchLog from './pages/DispatchLog';
 import DistrictReports from './pages/DistrictReports';
+import TrendAnalysis from './pages/TrendAnalysis';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
           <Route path="/forecasts" element={<MorbidityForecasts />} />
           <Route path="/dispatch" element={<DispatchLog />} />
           <Route path="/district-reports" element={<DistrictReports />} />
+          <Route path="/trends" element={<TrendAnalysis />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

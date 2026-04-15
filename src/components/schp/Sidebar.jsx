@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/lib/authContext';
 import {
   Map, Activity, AlertTriangle, Package, BarChart2,
-  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio
+  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp
 } from 'lucide-react';
 
 const NAV_PUBLIC = [
@@ -11,6 +11,7 @@ const NAV_PUBLIC = [
   { path: '/sensors', label: 'Sensor Network', icon: Radio, desc: 'DePIN Node Status' },
   { path: '/predictor', label: 'AI Predictor', icon: Activity, desc: 'XAI Anomaly Engine' },
   { path: '/forecasts', label: 'Morbidity Forecasts', icon: BarChart2, desc: 'Predictive Analytics' },
+  { path: '/trends', label: 'Trend Analysis', icon: TrendingUp, desc: '30-Day Climate Patterns' },
 ];
 
 const NAV_ADMIN = [
