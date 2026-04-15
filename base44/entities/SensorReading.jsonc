@@ -1,0 +1,47 @@
+{
+  "name": "SensorReading",
+  "type": "object",
+  "properties": {
+    "school_id": {
+      "type": "string",
+      "description": "Reference to School"
+    },
+    "school_name": {
+      "type": "string"
+    },
+    "pm25": {
+      "type": "number",
+      "description": "PM2.5 air quality reading \u03bcg/m\u00b3"
+    },
+    "temperature": {
+      "type": "number",
+      "description": "Temperature in Celsius"
+    },
+    "humidity": {
+      "type": "number",
+      "description": "Relative humidity %"
+    },
+    "heat_index": {
+      "type": "number",
+      "description": "Calculated heat index \u00b0C"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Normal",
+        "Caution",
+        "Warning",
+        "Red Alert"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "school_id",
+    "pm25",
+    "temperature"
+  ]
+}

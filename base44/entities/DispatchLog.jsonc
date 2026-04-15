@@ -1,0 +1,70 @@
+{
+  "name": "DispatchLog",
+  "type": "object",
+  "properties": {
+    "school_id": {
+      "type": "string"
+    },
+    "school_name": {
+      "type": "string"
+    },
+    "district": {
+      "type": "string"
+    },
+    "trigger_type": {
+      "type": "string",
+      "enum": [
+        "PM2.5 Spike",
+        "Heat Index Alert",
+        "Humidity Anomaly",
+        "Combined Alert"
+      ]
+    },
+    "trigger_value": {
+      "type": "string",
+      "description": "e.g. PM2.5: 187 \u03bcg/m\u00b3"
+    },
+    "supplies": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of supplies dispatched"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Dispatched",
+        "Delivered",
+        "Acknowledged"
+      ]
+    },
+    "xai_reason": {
+      "type": "string",
+      "description": "Explainable AI justification"
+    },
+    "morbidity_forecast": {
+      "type": "string",
+      "description": "Predicted health impact"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Medium",
+        "High",
+        "Critical"
+      ]
+    },
+    "dispatched_by": {
+      "type": "string",
+      "default": "Sentinel Dispatch Engine v1.0"
+    }
+  },
+  "required": [
+    "school_id",
+    "trigger_type",
+    "status"
+  ]
+}

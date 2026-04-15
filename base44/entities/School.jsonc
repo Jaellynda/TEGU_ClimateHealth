@@ -1,0 +1,54 @@
+{
+  "name": "School",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "School name"
+    },
+    "district": {
+      "type": "string",
+      "enum": [
+        "Kampala",
+        "Jinja",
+        "Wakiso",
+        "Mukono",
+        "Entebbe"
+      ]
+    },
+    "lat": {
+      "type": "number",
+      "description": "Latitude"
+    },
+    "lng": {
+      "type": "number",
+      "description": "Longitude"
+    },
+    "student_population": {
+      "type": "number",
+      "description": "Number of enrolled students"
+    },
+    "vulnerability_score": {
+      "type": "number",
+      "description": "Pediatric risk score 0-100"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Moderate",
+        "High",
+        "Critical"
+      ]
+    },
+    "has_sensor": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "name",
+    "lat",
+    "lng"
+  ]
+}

@@ -1,0 +1,163 @@
+import React, { useState } from 'react';
+import { DISPATCH_LOGS } from '@/lib/schpData';
+import { useAdminAuth } from '@/lib/authContext';
+import { Package, CheckCircle, Clock, Truck, AlertTriangle, ChevronDown, ChevronUp, Lock, Brain } from 'lucide-react';
+
+const STATUS_CONFIG = {
+  Pending: { color: 'text-yellow-700', bg: 'bg-yellow-100', border: 'border-yellow-200', icon: Clock },
+  Dispatched: { color: 'text-blue-700', bg: 'bg-blue-100', border: 'border-blue-200', icon: Truck },
+  Delivered: { color: 'text-green-700', bg: 'bg-green-100', border: 'border-green-200', icon: CheckCircle },
+  Acknowledged: { color: 'text-purple-700', bg: 'bg-purple-100', border: 'border-purple-200', icon: CheckCircle },
+};
+
+const PRIORITY_CONFIG = {
+  Critical: { badge: 'bg-red-100 text-red-700 border-red-200' },
+  High: { badge: 'bg-orange-100 text-orange-700 border-orange-200' },
+  Medium: { badge: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
+};
+
+function DispatchCard({ dispatch }) {
+  const [expanded, setExpanded] = useState(false);
+  const status = STATUS_CONFIG[dispatch.status] || STATUS_CONFIG.Pending;
+  const priority = PRIORITY_CONFIG[dispatch.priority] || PRIORITY_CONFIG.Medium;
+  const StatusIcon = status.icon;
+
+  return (
+    <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <div className="w-9 h-9 rounded-lg bg-[#1B4F72]/10 flex items-center justify-center flex-shrink-0">
+              <Package className="w-4 h-4 text-[#1B4F72]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                <p className="text-[14px] font-bold text-[#1B4F72]">{dispatch.school_name}</p>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${priority.badge}`}>{dispatch.priority}</span>
+              </div>
+              <p className="text-[12px] text-muted-foreground">{dispatch.district} · {dispatch.trigger_type}</p>
+              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Trigger: {dispatch.trigger_value}</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${status.bg} ${status.border}`}>
+              <StatusIcon className={`w-3.5 h-3.5 ${status.color}`} />
+              <span className={`text-[11px] font-semibold ${status.color}`}>{dispatch.status}</span>
+            </div>
+            <button onClick={() => setExpanded(!expanded)} className="text-muted-foreground hover:text-foreground transition-colors">
+              {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Supplies */}
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {dispatch.supplies.map((s, i) => (
+            <span key={i} className="text-[11px] bg-muted text-muted-foreground px-2.5 py-1 rounded-full border border-border">
+              {s}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="px-4 pb-4 space-y-3 border-t border-border pt-3">
+          <div className="bg-[#1B4F72]/5 rounded-lg p-3 border border-[#1B4F72]/10">
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <Brain className="w-3.5 h-3.5 text-[#E67E22]" />
+              <span className="text-[11px] font-semibold text-[#E67E22] uppercase tracking-wide">XAI Reason</span>
+            </div>
+            <p className="text-[12px] text-foreground leading-relaxed">{dispatch.xai_reason}</p>
+          </div>
+          <div className="bg-orange-50 rounded-lg p-3 border border-orange-100">
+            <p className="text-[11px] font-semibold text-[#E67E22] uppercase tracking-wide mb-1">Morbidity Forecast</p>
+            <p className="text-[12px] text-orange-900">{dispatch.morbidity_forecast}</p>
+          </div>
+          <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 pt-1">
+            <span>ID: <code className="bg-muted px-1 rounded font-mono">{dispatch.id.toUpperCase()}</code></span>
+            <span>By: {dispatch.dispatched_by}</span>
+            <span>Time: {new Date(dispatch.created_date).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function DispatchLog() {
+  const { isAdmin, login } = useAdminAuth();
+  const [filter, setFilter] = useState('All');
+
+  const statusFilters = ['All', 'Pending', 'Dispatched', 'Delivered'];
+  const filtered = filter === 'All' ? DISPATCH_LOGS : DISPATCH_LOGS.filter(d => d.status === filter);
+
+  if (!isAdmin) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-[60vh]">
+        <div className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-full bg-[#1B4F72]/10 flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-7 h-7 text-[#1B4F72]" />
+          </div>
+          <h2 className="text-[20px] font-bold text-[#1B4F72] mb-2">Admin Access Required</h2>
+          <p className="text-muted-foreground text-[13px] mb-5">This view is restricted to verified health workers and district administrators.</p>
+          <button
+            onClick={login}
+            className="bg-[#E67E22] hover:bg-[#D35400] text-white font-semibold px-6 py-2.5 rounded-lg transition-colors"
+          >
+            Login as Health Worker
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 md:p-6 space-y-5 animate-fade-in">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#E67E22] to-[#D35400] rounded-xl p-5 text-white">
+        <div className="flex items-center gap-3 mb-2">
+          <Truck className="w-6 h-6" />
+          <h2 className="text-[18px] font-bold">Anticipatory Action Dispatch Log</h2>
+        </div>
+        <p className="text-orange-100 text-[13px]">
+          Admin View · Supply chain management · Sentinel Engine auto-dispatches
+        </p>
+        <div className="flex flex-wrap gap-3 mt-3">
+          {[
+            { label: 'Total Orders', value: DISPATCH_LOGS.length },
+            { label: 'Pending', value: DISPATCH_LOGS.filter(d => d.status === 'Pending').length },
+            { label: 'Dispatched', value: DISPATCH_LOGS.filter(d => d.status === 'Dispatched').length },
+            { label: 'Delivered', value: DISPATCH_LOGS.filter(d => d.status === 'Delivered').length },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white/20 rounded-lg px-3 py-1.5">
+              <span className="text-[11px] opacity-80">{label}: </span>
+              <span className="text-[14px] font-bold">{value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-2 flex-wrap">
+        {statusFilters.map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
+              filter === f ? 'bg-[#1B4F72] text-white' : 'bg-white text-muted-foreground border border-border hover:border-[#1B4F72]'
+            }`}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Cards */}
+      <div className="space-y-3">
+        {filtered.map(dispatch => (
+          <DispatchCard key={dispatch.id} dispatch={dispatch} />
+        ))}
+      </div>
+    </div>
+  );
+}
