@@ -46,7 +46,6 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-[11px] font-medium text-blue-300 uppercase tracking-widest">UNICEF Innovation</p>
               <h1 className="text-[13px] font-bold text-white leading-tight">Sentinel Climate-Health</h1>
               <p className="text-[10px] text-blue-300/70">Protocol v1.0</p>
             </div>

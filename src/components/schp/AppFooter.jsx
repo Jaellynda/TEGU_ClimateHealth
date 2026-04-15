@@ -30,7 +30,7 @@ export default function AppFooter() {
         </div>
         <div className="flex items-center gap-1 hover:text-white/70 cursor-pointer transition-colors">
           <Globe className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">UNICEF Innovation Fund</span>
+          <span className="hidden sm:inline">Uganda MOH</span>
         </div>
         <span className="text-white/30">© 2026 SCHP</span>
       </div>
