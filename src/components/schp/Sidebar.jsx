@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/lib/authContext';
 import {
   Map, Activity, AlertTriangle, Package, BarChart2,
-  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp
+  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp, ShoppingCart
 } from 'lucide-react';
 
 const NAV_PUBLIC = [
@@ -16,6 +16,7 @@ const NAV_PUBLIC = [
 
 const NAV_ADMIN = [
   { path: '/dispatch', label: 'Dispatch Log', icon: Package, desc: 'Anticipatory Actions' },
+  { path: '/inventory', label: 'Inventory', icon: ShoppingCart, desc: 'Medical Supply Stock' },
   { path: '/district-reports', label: 'District Reports', icon: FileText, desc: 'DHIS2-Ready Reports' },
 ];
 

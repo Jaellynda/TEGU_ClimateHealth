@@ -19,6 +19,7 @@ import DispatchLog from './pages/DispatchLog';
 import DistrictReports from './pages/DistrictReports';
 import TrendAnalysis from './pages/TrendAnalysis';
 import SchoolProfile from './pages/SchoolProfile';
+import Inventory from './pages/Inventory';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -52,6 +53,7 @@ const AuthenticatedApp = () => {
           <Route path="/district-reports" element={<DistrictReports />} />
           <Route path="/trends" element={<TrendAnalysis />} />
           <Route path="/school/:schoolId" element={<SchoolProfile />} />
+          <Route path="/inventory" element={<Inventory />} />
         </Route>
         <Route path="*" element={<PageNotFound />} />
       </Routes>

@@ -6,6 +6,7 @@ import { AlertTriangle, Users, Thermometer, Wind, Activity, MessageCircle, Layer
 import { Link } from 'react-router-dom';
 import HeatmapLayer from '@/components/schp/HeatmapLayer';
 import WhatsAppNotifier from '@/components/schp/WhatsAppNotifier';
+import RiskSummaryWidget from '@/components/schp/RiskSummaryWidget';
 
 const LAYERS = [
   { id: 'pm25', label: 'Air Quality (PM2.5)' },
@@ -241,6 +242,9 @@ export default function LiveMap() {
           onClose={() => setWhatsappDispatch(null)}
         />
       )}
+
+      {/* Risk Summary Widget */}
+      <RiskSummaryWidget />
 
       {/* Heatmap legend note */}
       {showHeatmap && activeLayer !== 'vulnerability' && (

@@ -1,0 +1,42 @@
+{
+  "name": "Inventory",
+  "type": "object",
+  "properties": {
+    "item_name": {
+      "type": "string",
+      "description": "Name of the medical supply item"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Respiratory",
+        "Hydration",
+        "Heat Management",
+        "Allergy",
+        "Eye Care",
+        "PPE",
+        "Other"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "description": "Unit of measurement (units, sachets, boxes, tablets)"
+    },
+    "stock": {
+      "type": "number",
+      "description": "Current stock quantity"
+    },
+    "min_stock": {
+      "type": "number",
+      "description": "Minimum stock level before alert triggers"
+    },
+    "unit_cost": {
+      "type": "number",
+      "description": "Cost per unit in USD"
+    }
+  },
+  "required": [
+    "item_name",
+    "stock"
+  ]
+}

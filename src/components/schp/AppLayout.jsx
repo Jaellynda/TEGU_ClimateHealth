@@ -13,6 +13,7 @@ const PAGE_META = {
   '/dispatch': { title: 'Anticipatory Action Log', subtitle: 'Admin · TEGU Systems Dispatch Orders & Supply Chain Status' },
   '/district-reports': { title: 'District Health Reports', subtitle: 'Admin · DHIS2-Ready Export · Uganda MOH Integration' },
   '/trends': { title: '30-Day Trend Analysis', subtitle: 'Historical PM2.5 & Heat Index patterns · NGO & policy reporting' },
+  '/inventory': { title: 'Medical Supply Inventory', subtitle: 'Admin · Stock Management · Linked to Dispatch System' },
 };
 
 export default function AppLayout() {
