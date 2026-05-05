@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { SCHOOLS, SENSOR_READINGS, getRiskColor, getVulnerabilityColor, getPM25Level, DISPATCH_LOGS } from '@/lib/schpData';
-import { AlertTriangle, Users, Thermometer, Wind, Activity, MessageCircle, Layers } from 'lucide-react';
+import { AlertTriangle, Users, Thermometer, Wind, Activity, MessageCircle, Layers, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import HeatmapLayer from '@/components/schp/HeatmapLayer';
 import WhatsAppNotifier from '@/components/schp/WhatsAppNotifier';
 
@@ -176,7 +177,7 @@ export default function LiveMap() {
 
         {/* School List */}
         <div className="space-y-2 overflow-y-auto max-h-[460px] pr-1">
-          <h3 className="text-[13px] font-semibold text-[#1B4F72] mb-3">Sentinel Schools</h3>
+          <h3 className="text-[13px] font-semibold text-[#1B4F72] mb-3">TEGU Sentinel Schools</h3>
           {SCHOOLS.map(school => {
             const reading = readingMap[school.id];
             const color = getMarkerColor(school, reading, activeLayer);
@@ -205,6 +206,14 @@ export default function LiveMap() {
                     <div className="mt-1.5"><AlertBadge status={reading.status} /></div>
                   )}
                 </button>
+                {/* View Profile link */}
+                <Link
+                  to={`/school/${school.id}`}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-[11px] font-semibold border-t border-border bg-blue-50 text-[#1B4F72] hover:bg-blue-100 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  View School Profile
+                </Link>
                 {/* WhatsApp alert button for schools with dispatch orders */}
                 {dispatch && (
                   <button

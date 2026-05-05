@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 import AppFooter from './AppFooter';
+import AlertBanner from './AlertBanner';
 
 const PAGE_META = {
   '/': { title: 'Live Climate Risk Map', subtitle: 'Uganda · TEGU Systems · Real-time environmental monitoring across 8 sentinel schools' },
@@ -29,6 +30,7 @@ export default function AppLayout() {
           subtitle={meta.subtitle}
         />
         <main className="flex-1 overflow-y-auto">
+          <AlertBanner />
           <Outlet />
         </main>
         <AppFooter />
