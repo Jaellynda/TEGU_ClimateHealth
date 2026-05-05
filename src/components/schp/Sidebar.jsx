@@ -46,8 +46,8 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-[13px] font-bold text-white leading-tight">Sentinel Climate-Health</h1>
-              <p className="text-[10px] text-blue-300/70">Protocol v1.0</p>
+              <h1 className="text-[13px] font-bold text-white leading-tight">TEGU Climate-Health</h1>
+              <p className="text-[10px] text-blue-300/70">by TEGU Systems · v1.0</p>
             </div>
           </div>
           {/* Close mobile */}

@@ -6,7 +6,7 @@ export default function AppFooter() {
     <footer className="bg-[#0D2B45] text-white px-5 py-3 flex flex-wrap items-center gap-3 text-[11px] flex-shrink-0">
       <div className="flex items-center gap-1.5">
         <Shield className="w-3.5 h-3.5 text-[#E67E22]" />
-        <span className="font-semibold text-[#E67E22]">Sentinel Climate-Health Protocol</span>
+        <span className="font-semibold text-[#E67E22]">TEGU Climate-Health Protocol</span>
       </div>
 
       <span className="text-white/30 hidden sm:inline">·</span>
@@ -21,7 +21,7 @@ export default function AppFooter() {
 
       <span className="text-white/30 hidden sm:inline">·</span>
 
-      <span className="text-white/50">Powered by Sentinel Dispatch Engine v1.0</span>
+      <span className="text-white/50">Powered by TEGU Systems · Dispatch Engine v1.0</span>
 
       <div className="ml-auto flex items-center gap-3 text-white/40">
         <div className="flex items-center gap-1 hover:text-white/70 cursor-pointer transition-colors">

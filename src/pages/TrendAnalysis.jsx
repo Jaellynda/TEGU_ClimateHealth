@@ -80,7 +80,7 @@ export default function TrendAnalysis() {
           <h2 className="text-[18px] font-bold">30-Day Climate Trend Analysis</h2>
         </div>
         <p className="text-blue-200 text-[13px]">
-          Historical PM2.5 & Heat Index patterns across Uganda sentinel schools · Last 30 days · For NGO & policy reporting
+          Historical PM2.5 & Heat Index patterns across Uganda sentinel schools · TEGU Systems · Last 30 days · For NGO & policy reporting
         </p>
         <div className="flex flex-wrap gap-3 mt-3">
           {[

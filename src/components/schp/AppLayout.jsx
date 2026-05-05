@@ -5,11 +5,11 @@ import TopBar from './TopBar';
 import AppFooter from './AppFooter';
 
 const PAGE_META = {
-  '/': { title: 'Live Climate Risk Map', subtitle: 'Uganda · Real-time environmental monitoring across 8 sentinel schools' },
+  '/': { title: 'Live Climate Risk Map', subtitle: 'Uganda · TEGU Systems · Real-time environmental monitoring across 8 sentinel schools' },
   '/sensors': { title: 'DePIN Sensor Network', subtitle: 'Distributed IoT Nodes — Kampala & Jinja Regions' },
   '/predictor': { title: 'AI Anomaly Predictor', subtitle: 'Explainable AI (XAI) · Sentinel Engine v1.0' },
   '/forecasts': { title: 'Predictive Morbidity Forecasts', subtitle: 'Climate-sensitive disease projection · 48-hour window' },
-  '/dispatch': { title: 'Anticipatory Action Log', subtitle: 'Admin · Dispatch Orders & Supply Chain Status' },
+  '/dispatch': { title: 'Anticipatory Action Log', subtitle: 'Admin · TEGU Systems Dispatch Orders & Supply Chain Status' },
   '/district-reports': { title: 'District Health Reports', subtitle: 'Admin · DHIS2-Ready Export · Uganda MOH Integration' },
   '/trends': { title: '30-Day Trend Analysis', subtitle: 'Historical PM2.5 & Heat Index patterns · NGO & policy reporting' },
 };

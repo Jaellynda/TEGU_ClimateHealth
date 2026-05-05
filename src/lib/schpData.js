@@ -29,7 +29,7 @@ export const DISPATCH_LOGS = [
     status: "Dispatched", priority: "Critical",
     xai_reason: "Anticipatory Action triggered: PM2.5 reading of 187 μg/m³ at Kampala Parents School exceeds WHO child-safe threshold by 124%. Combined with heat index of 42.1°C, respiratory distress risk for asthmatic children is elevated. Sentinel Engine activated Protocol ALPHA-3.",
     morbidity_forecast: "Forecast: 23% increase in asthma-related emergency visits over next 48 hours. 1,350 students at elevated exposure risk.",
-    dispatched_by: "Sentinel Dispatch Engine v1.0", created_date: "2026-04-15T08:31:00Z"
+    dispatched_by: "TEGU Dispatch Engine v1.0", created_date: "2026-04-15T08:31:00Z"
   },
   {
     id: "d2", school_id: "s2", school_name: "Jinja Central Primary School", district: "Jinja",
@@ -38,7 +38,7 @@ export const DISPATCH_LOGS = [
     status: "Pending", priority: "Critical",
     xai_reason: "Anticipatory Action triggered: Heat index of 44.5°C at Jinja Central Primary School exceeds child-safe threshold by 4.5°C. Forecast suggests 15% increase in dehydration-related morbidity over next 48 hours. 890 students identified as vulnerable to heatstroke.",
     morbidity_forecast: "Forecast: 15% increase in dehydration & heatstroke cases. Peak risk window: 10:00–14:00 EAT.",
-    dispatched_by: "Sentinel Dispatch Engine v1.0", created_date: "2026-04-15T08:29:00Z"
+    dispatched_by: "TEGU Dispatch Engine v1.0", created_date: "2026-04-15T08:29:00Z"
   },
   {
     id: "d3", school_id: "s6", school_name: "Victoria Nile Primary School", district: "Jinja",
@@ -47,7 +47,7 @@ export const DISPATCH_LOGS = [
     status: "Delivered", priority: "High",
     xai_reason: "Combined environmental anomaly detected: PM2.5 (168 μg/m³) and elevated heat index (43.0°C) at Victoria Nile Primary creating compounded health risk. Particulate matter at this concentration causes bronchospasm in children under 12. Combined thermal stress amplifies risk by estimated 2.3x.",
     morbidity_forecast: "Forecast: 18% increase in combined respiratory & heat-related morbidity. 760 students at risk.",
-    dispatched_by: "Sentinel Dispatch Engine v1.0", created_date: "2026-04-15T07:45:00Z"
+    dispatched_by: "TEGU Dispatch Engine v1.0", created_date: "2026-04-15T07:45:00Z"
   },
 ];
 

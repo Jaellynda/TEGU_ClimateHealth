@@ -104,7 +104,7 @@ function XAICard({ dispatch, expanded: initExpanded = false }) {
 
       <div className="px-4 py-2 bg-black/5 flex items-center justify-between text-[10px] text-muted-foreground">
         <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {new Date(dispatch.created_date).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
-        <span>{dispatch.dispatched_by}</span>
+        <span>TEGU Dispatch Engine v1.0</span>
       </div>
     </div>
   );
@@ -119,10 +119,10 @@ export default function AIPredictor() {
       <div className="bg-gradient-to-r from-[#1B4F72] to-[#2E86C1] rounded-xl p-5 text-white">
         <div className="flex items-center gap-3 mb-2">
           <Brain className="w-6 h-6 text-[#E67E22]" />
-          <h2 className="text-[18px] font-bold">Sentinel AI Anomaly Predictor</h2>
+          <h2 className="text-[18px] font-bold">TEGU AI Anomaly Predictor</h2>
         </div>
         <p className="text-blue-200 text-[13px]">
-          Rule-based Explainable AI (XAI) Engine · Anticipatory Action Protocol · Real-time anomaly detection across all sentinel school nodes.
+          Rule-based Explainable AI (XAI) Engine · TEGU Systems · Anticipatory Action Protocol · Real-time anomaly detection across all sentinel school nodes.
         </p>
         <div className="flex flex-wrap gap-3 mt-3">
           {[
@@ -142,7 +142,7 @@ export default function AIPredictor() {
       <div className="bg-white rounded-xl border border-border p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <AlertTriangle className="w-4 h-4 text-[#E67E22]" />
-          <h3 className="text-[14px] font-semibold text-[#1B4F72]">Detection Rules — Sentinel Engine v1.0</h3>
+          <h3 className="text-[14px] font-semibold text-[#1B4F72]">Detection Rules — TEGU Engine v1.0</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[

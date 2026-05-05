@@ -18,7 +18,7 @@ function buildWhatsAppMessage(dispatch) {
     `📋 *AI Forecast:* ${dispatch.morbidity_forecast}\n\n` +
     `✅ Confirm dispatch here:\n` +
     `https://schp.app/dispatch\n\n` +
-    `_Sentinel Climate-Health Protocol — Uganda MOH_`;
+    `_TEGU Climate-Health Protocol · TEGU Systems — Uganda MOH_`;
 }
 
 export default function WhatsAppNotifier({ dispatch, onClose }) {

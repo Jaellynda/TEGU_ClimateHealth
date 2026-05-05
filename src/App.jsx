@@ -27,7 +27,7 @@ const AuthenticatedApp = () => {
       <div className="fixed inset-0 flex items-center justify-center bg-[#0D2B45]">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-[#1B4F72] border-t-[#E67E22] rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-white/60 text-[12px] font-inter">Sentinel Climate-Health Protocol</p>
+          <p className="text-white/60 text-[12px] font-inter">TEGU Climate-Health Protocol</p>
           <p className="text-white/30 text-[10px]">Initializing...</p>
         </div>
       </div>
