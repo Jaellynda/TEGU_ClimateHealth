@@ -1,0 +1,53 @@
+{
+  "name": "Student",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string"
+    },
+    "school_id": {
+      "type": "string",
+      "description": "Reference to SentinelSchool"
+    },
+    "school_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "age": {
+      "type": "number"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "Pending",
+        "Confirmed",
+        "Flagged"
+      ],
+      "default": "Pending"
+    },
+    "biometric_captured": {
+      "type": "boolean",
+      "default": false
+    },
+    "verified_by": {
+      "type": "string",
+      "description": "Health worker email"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Moderate",
+        "High",
+        "Critical"
+      ],
+      "default": "Low"
+    }
+  },
+  "required": [
+    "full_name",
+    "school_id"
+  ]
+}

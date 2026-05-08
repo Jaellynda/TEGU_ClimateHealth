@@ -21,6 +21,8 @@ import TrendAnalysis from './pages/TrendAnalysis';
 import SchoolProfile from './pages/SchoolProfile';
 import Inventory from './pages/Inventory';
 import IdentityVerification from './pages/IdentityVerification';
+import IdentityDashboard from './pages/IdentityDashboard';
+import UnifiedImpact from './pages/UnifiedImpact';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -47,6 +49,8 @@ const AuthenticatedApp = () => {
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/identity" element={<IdentityVerification />} />
+          <Route path="/identity-dashboard" element={<IdentityDashboard />} />
+          <Route path="/unified-impact" element={<UnifiedImpact />} />
           <Route path="/" element={<LiveMap />} />
           <Route path="/sensors" element={<SensorNetwork />} />
           <Route path="/predictor" element={<AIPredictor />} />
