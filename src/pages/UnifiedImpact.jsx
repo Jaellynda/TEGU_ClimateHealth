@@ -19,6 +19,8 @@ export default function UnifiedImpact() {
     return r && (r.pm25 > 150 || r.heat_index > 42);
   }).length;
 
+  const verifiedCount = SCHOOLS.filter(s => s.has_sensor).length;
+
   const studentsInHighRisk = SCHOOLS
     .filter(s => {
       const r = readingMap[s.id];
@@ -143,19 +145,19 @@ export default function UnifiedImpact() {
         </div>
       </div>
 
-      {/* Risk Overlap Analysis */}
+      {/* Sentinel Coverage Analysis */}
       <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-5 shadow-sm">
         <h3 className="text-[14px] font-bold text-zinc-900 mb-3 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-600" />
-          Risk-Identity Overlap Analysis
+          Sentinel Coverage Analysis
         </h3>
         <p className="text-[12px] text-zinc-700 leading-relaxed mb-3">
-          <strong>{studentsInCritical.toLocaleString()} students</strong> in critical climate zones have been identified through the Unified Sentinel Infrastructure. Of these, <strong>{Math.round((MOCK_VERIFIED_STUDENTS / 1632) * studentsInCritical).toLocaleString()} students</strong> are identity-verified and registered for proactive health interventions.
+          <strong>{studentsInCritical.toLocaleString()} students</strong> in critical climate zones are located across {criticalSchools} monitored schools. Of these, <strong>{Math.round((verifiedCount / SCHOOLS.length) * studentsInCritical).toLocaleString()} students</strong> are currently covered by Identity-Verified Sentinel Nodes—schools with active, calibrated sensors and verified dispatch coordinates.
         </p>
         <div className="flex gap-3 text-[11px]">
           <div className="flex-1 bg-white border border-amber-200 rounded-lg p-2.5">
             <p className="font-semibold text-amber-900">Priority Action:</p>
-            <p className="text-amber-700 mt-0.5">Accelerate biometric enrollment in critical-risk schools to increase verified coverage.</p>
+            <p className="text-amber-700 mt-0.5">Accelerate Sentinel Node Authentication for remaining schools to ensure 100% verified geospatial coverage in high-risk corridors.</p>
           </div>
         </div>
       </div>

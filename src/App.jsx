@@ -23,6 +23,7 @@ import Inventory from './pages/Inventory';
 import IdentityVerification from './pages/IdentityVerification';
 import IdentityDashboard from './pages/IdentityDashboard';
 import UnifiedImpact from './pages/UnifiedImpact';
+import Settings from './pages/Settings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
           <Route path="/identity" element={<IdentityVerification />} />
           <Route path="/identity-dashboard" element={<IdentityDashboard />} />
           <Route path="/unified-impact" element={<UnifiedImpact />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/" element={<LiveMap />} />
           <Route path="/sensors" element={<SensorNetwork />} />
           <Route path="/predictor" element={<AIPredictor />} />
