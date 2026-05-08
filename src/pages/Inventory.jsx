@@ -239,13 +239,40 @@ export default function Inventory() {
         )}
       </div>
 
-      {/* Low stock alert */}
-      {critCount > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-[13px] font-bold text-red-700">{critCount} item(s) at critically low stock</p>
-            <p className="text-[12px] text-red-600 mt-0.5">Immediate restocking required before next dispatch can be confirmed.</p>
+      {/* Automated restock warnings */}
+      {(critCount > 0 || lowCount > 0) && (
+        <div className="rounded-xl border overflow-hidden shadow-sm">
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-amber-600">
+            <AlertTriangle className="w-4 h-4 text-white" />
+            <span className="text-[13px] font-bold text-white">Restock Warning — Action Required Before Next Dispatch</span>
+          </div>
+          <div className="divide-y divide-amber-100 bg-amber-50 border border-amber-200 border-t-0 rounded-b-xl">
+            {inventory
+              .filter(i => i.stock <= i.min_stock)
+              .sort((a, b) => (a.stock / a.min_stock) - (b.stock / b.min_stock))
+              .map(item => {
+                const isCrit = item.stock <= item.min_stock * 0.5;
+                return (
+                  <div key={item.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isCrit ? 'bg-red-500 animate-pulse' : 'bg-orange-400'}`} />
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[12px] font-semibold text-foreground">{item.item_name}</span>
+                      <span className="text-[11px] text-muted-foreground ml-2">({item.category})</span>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <span className={`text-[12px] font-bold ${isCrit ? 'text-red-600' : 'text-orange-600'}`}>
+                        {item.stock} {item.unit}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground ml-1">/ min {item.min_stock}</span>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border flex-shrink-0 ${
+                      isCrit ? 'bg-red-100 text-red-700 border-red-200' : 'bg-orange-100 text-orange-700 border-orange-200'
+                    }`}>
+                      {isCrit ? 'Critical' : 'Low'}
+                    </span>
+                  </div>
+                );
+              })}
           </div>
         </div>
       )}

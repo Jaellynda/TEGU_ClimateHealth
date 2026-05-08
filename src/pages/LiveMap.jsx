@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import HeatmapLayer from '@/components/schp/HeatmapLayer';
 import WhatsAppNotifier from '@/components/schp/WhatsAppNotifier';
 import RiskSummaryWidget from '@/components/schp/RiskSummaryWidget';
+import ActiveAlertsFeed from '@/components/schp/ActiveAlertsFeed';
 
 const LAYERS = [
   { id: 'pm25', label: 'Air Quality (PM2.5)' },
@@ -68,6 +69,9 @@ export default function LiveMap() {
 
   return (
     <div className="p-4 md:p-6 space-y-4 animate-fade-in">
+      {/* Active Alerts Feed */}
+      <ActiveAlertsFeed />
+
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard icon={AlertTriangle} label="Red Alerts" value={alertCount} color="#C0392B" />
