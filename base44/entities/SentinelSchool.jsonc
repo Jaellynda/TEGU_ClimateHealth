@@ -1,0 +1,65 @@
+{
+  "name": "SentinelSchool",
+  "type": "object",
+  "properties": {
+    "school_name": {
+      "type": "string",
+      "description": "Official school name"
+    },
+    "district": {
+      "type": "string",
+      "enum": [
+        "Kampala",
+        "Jinja",
+        "Wakiso",
+        "Mukono",
+        "Entebbe"
+      ]
+    },
+    "h3_id_resolution_9": {
+      "type": "string",
+      "description": "Permanent H3 hex grid cell ID at resolution 9 (e.g., 8922c3d8d99ffff)"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "student_population": {
+      "type": "number"
+    },
+    "vulnerability_score": {
+      "type": "number",
+      "description": "0-100 pediatric risk score"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "Low",
+        "Moderate",
+        "High",
+        "Critical"
+      ]
+    },
+    "has_sensor": {
+      "type": "boolean",
+      "default": true
+    },
+    "sentinel_status": {
+      "type": "string",
+      "enum": [
+        "Online",
+        "Warning",
+        "Offline"
+      ],
+      "default": "Online"
+    }
+  },
+  "required": [
+    "school_name",
+    "h3_id_resolution_9",
+    "lat",
+    "lng"
+  ]
+}

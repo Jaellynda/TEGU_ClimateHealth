@@ -20,6 +20,7 @@ import DistrictReports from './pages/DistrictReports';
 import TrendAnalysis from './pages/TrendAnalysis';
 import SchoolProfile from './pages/SchoolProfile';
 import Inventory from './pages/Inventory';
+import IdentityVerification from './pages/IdentityVerification';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -45,6 +46,7 @@ const AuthenticatedApp = () => {
     <AdminAuthProvider>
       <Routes>
         <Route element={<AppLayout />}>
+          <Route path="/identity" element={<IdentityVerification />} />
           <Route path="/" element={<LiveMap />} />
           <Route path="/sensors" element={<SensorNetwork />} />
           <Route path="/predictor" element={<AIPredictor />} />

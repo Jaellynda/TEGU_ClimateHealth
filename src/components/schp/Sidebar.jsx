@@ -3,10 +3,14 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAdminAuth } from '@/lib/authContext';
 import {
   Map, Activity, AlertTriangle, Package, BarChart2,
-  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp, ShoppingCart
+  FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp, ShoppingCart, Lock
 } from 'lucide-react';
 
-const NAV_PUBLIC = [
+const NAV_IDENTITY = [
+  { path: '/identity', label: 'Verify Sentinel', icon: Shield, desc: 'Identity Module' },
+];
+
+const NAV_CLIMATE_HEALTH = [
   { path: '/', label: 'Live Map', icon: Map, desc: 'Uganda Climate Risk Map' },
   { path: '/sensors', label: 'Sensor Network', icon: Radio, desc: 'DePIN Node Status' },
   { path: '/predictor', label: 'AI Predictor', icon: Activity, desc: 'XAI Anomaly Engine' },
@@ -70,10 +74,33 @@ export default function Sidebar({ mobileOpen, onMobileClose }) {
           </div>
         </div>
 
-        {/* Public Nav */}
+        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          <p className="text-[10px] uppercase tracking-widest text-blue-400/60 px-2 mb-2">Public Dashboard</p>
-          {NAV_PUBLIC.map(({ path, label, icon: Icon, desc }) => (
+          {/* Identity Sector */}
+          <p className="text-[10px] uppercase tracking-widest text-emerald-400/70 px-2 mb-2">Identity Verification</p>
+          {NAV_IDENTITY.map(({ path, label, icon: Icon, desc }) => (
+            <Link
+              key={path}
+              to={path}
+              onClick={onMobileClose}
+              className={`
+                flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all group
+                ${isActive(path)
+                  ? 'bg-emerald-600 text-white'
+                  : 'text-emerald-200/80 hover:bg-emerald-900/30 hover:text-white'}
+              `}
+            >
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <div>
+                <p className="text-[13px] font-medium">{label}</p>
+                <p className={`text-[10px] ${isActive(path) ? 'text-emerald-100' : 'text-emerald-400/60'}`}>{desc}</p>
+              </div>
+            </Link>
+          ))}
+
+          {/* Climate-Health Sector */}
+          <p className="text-[10px] uppercase tracking-widest text-blue-400/60 px-2 mb-2 mt-4">Climate-Health Protocol</p>
+          {NAV_CLIMATE_HEALTH.map(({ path, label, icon: Icon, desc }) => (
             <Link
               key={path}
               to={path}
