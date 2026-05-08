@@ -5,7 +5,7 @@ import { DISPATCH_LOGS } from '@/lib/schpData';
 import { useAdminAuth } from '@/lib/authContext';
 import {
   Package, CheckCircle, Clock, Truck, ChevronDown, ChevronUp,
-  Lock, Brain, Send, MapPin
+  Lock, Brain, Send, MapPin, Square, CheckSquare, Zap, X
 } from 'lucide-react';
 
 const STATUS_CONFIG = {
@@ -21,7 +21,7 @@ const PRIORITY_CONFIG = {
   Medium:   { badge: 'bg-yellow-100 text-yellow-700 border-yellow-200' },
 };
 
-function DispatchCard({ dispatch, onStatusChange }) {
+function DispatchCard({ dispatch, onStatusChange, selected, onToggleSelect }) {
   const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -31,44 +31,55 @@ function DispatchCard({ dispatch, onStatusChange }) {
 
   const handleAction = async (newStatus) => {
     setLoading(true);
-    const timestamp = new Date().toISOString();
     const dispatchedBy = newStatus === 'Dispatched'
       ? `Health Worker · ${new Date().toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT`
       : dispatch.dispatched_by;
-    await onStatusChange(dispatch.id, { status: newStatus, dispatched_by: dispatchedBy, updated_at: timestamp });
+    await onStatusChange(dispatch.id, { status: newStatus, dispatched_by: dispatchedBy });
     setLoading(false);
   };
 
   return (
-    <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+    <div className={`bg-white rounded-xl border shadow-sm overflow-hidden transition-all ${selected ? 'border-[#1B4F72] ring-2 ring-[#1B4F72]/20' : 'border-border'}`}>
       <div className="p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-[#1B4F72]/10 flex items-center justify-center flex-shrink-0">
-              <Package className="w-4 h-4 text-[#1B4F72]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                <p className="text-[14px] font-bold text-[#1B4F72]">{dispatch.school_name}</p>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${priority.badge}`}>{dispatch.priority}</span>
+        <div className="flex items-start gap-3">
+          {/* Checkbox */}
+          <button
+            onClick={() => onToggleSelect(dispatch.id)}
+            className="mt-0.5 flex-shrink-0 text-muted-foreground hover:text-[#1B4F72] transition-colors"
+          >
+            {selected
+              ? <CheckSquare className="w-5 h-5 text-[#1B4F72]" />
+              : <Square className="w-5 h-5" />}
+          </button>
+
+          <div className="flex items-start justify-between gap-3 flex-1 min-w-0">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div className="w-9 h-9 rounded-lg bg-[#1B4F72]/10 flex items-center justify-center flex-shrink-0">
+                <Package className="w-4 h-4 text-[#1B4F72]" />
               </div>
-              <p className="text-[12px] text-muted-foreground">{dispatch.district} · {dispatch.trigger_type}</p>
-              <p className="text-[11px] text-muted-foreground/70 mt-0.5">Trigger: {dispatch.trigger_value}</p>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                  <p className="text-[14px] font-bold text-[#1B4F72]">{dispatch.school_name}</p>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${priority.badge}`}>{dispatch.priority}</span>
+                </div>
+                <p className="text-[12px] text-muted-foreground">{dispatch.district} · {dispatch.trigger_type}</p>
+                <p className="text-[11px] text-muted-foreground/70 mt-0.5">Trigger: {dispatch.trigger_value}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${status.bg} ${status.border}`}>
-              <StatusIcon className={`w-3.5 h-3.5 ${status.color}`} />
-              <span className={`text-[11px] font-semibold ${status.color}`}>{dispatch.status}</span>
+            <div className="flex flex-col items-end gap-2 flex-shrink-0">
+              <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${status.bg} ${status.border}`}>
+                <StatusIcon className={`w-3.5 h-3.5 ${status.color}`} />
+                <span className={`text-[11px] font-semibold ${status.color}`}>{dispatch.status}</span>
+              </div>
+              <button onClick={() => setExpanded(!expanded)} className="text-muted-foreground hover:text-foreground transition-colors">
+                {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
             </div>
-            <button onClick={() => setExpanded(!expanded)} className="text-muted-foreground hover:text-foreground transition-colors">
-              {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
           </div>
         </div>
 
         {/* Supplies */}
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-3 ml-8 flex flex-wrap gap-1.5">
           {dispatch.supplies?.map((s, i) => (
             <span key={i} className="text-[11px] bg-muted text-muted-foreground px-2.5 py-1 rounded-full border border-border">
               {s}
@@ -77,7 +88,7 @@ function DispatchCard({ dispatch, onStatusChange }) {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 ml-8 flex gap-2">
           {dispatch.status === 'Pending' && (
             <button
               disabled={loading}
@@ -133,30 +144,71 @@ function DispatchCard({ dispatch, onStatusChange }) {
   );
 }
 
+function BulkDispatchBar({ selected, dispatches, onBulkDispatch, onClear }) {
+  const [loading, setLoading] = useState(false);
+  const selectedDispatches = dispatches.filter(d => selected.has(d.id));
+  const pendingCount = selectedDispatches.filter(d => d.status === 'Pending').length;
+
+  // Merge all unique supplies across selected
+  const allSupplies = [...new Set(selectedDispatches.flatMap(d => d.supplies || []))];
+
+  const handle = async () => {
+    setLoading(true);
+    await onBulkDispatch(selectedDispatches.filter(d => d.status === 'Pending').map(d => d.id));
+    setLoading(false);
+    onClear();
+  };
+
+  return (
+    <div className="bg-[#1B4F72] text-white rounded-xl p-4 flex flex-wrap items-center gap-4 shadow-lg">
+      <div className="flex items-center gap-2">
+        <Zap className="w-5 h-5 text-[#E67E22]" />
+        <span className="text-[14px] font-bold">{selected.size} school{selected.size !== 1 ? 's' : ''} selected</span>
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] text-blue-200 mb-1">Combined supplies for bulk dispatch:</p>
+        <div className="flex flex-wrap gap-1.5">
+          {allSupplies.slice(0, 6).map((s, i) => (
+            <span key={i} className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">{s}</span>
+          ))}
+          {allSupplies.length > 6 && <span className="text-[10px] text-blue-300">+{allSupplies.length - 6} more</span>}
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        {pendingCount > 0 && (
+          <button
+            disabled={loading}
+            onClick={handle}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#E67E22] hover:bg-[#D35400] text-white text-[12px] font-bold transition-colors disabled:opacity-60"
+          >
+            <Send className="w-3.5 h-3.5" />
+            {loading ? 'Dispatching...' : `Bulk Dispatch (${pendingCount} pending)`}
+          </button>
+        )}
+        <button onClick={onClear} className="text-white/60 hover:text-white transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DispatchLog() {
   const { isAdmin, login } = useAdminAuth();
   const [filter, setFilter] = useState('All');
+  const [selected, setSelected] = useState(new Set());
   const queryClient = useQueryClient();
 
-  // Seed DB from mock data on first load if empty
   const { data: dbLogs = [], isLoading } = useQuery({
     queryKey: ['dispatchLogs'],
     queryFn: async () => {
       const existing = await base44.entities.DispatchLog.list('-created_date', 50);
       if (existing.length === 0) {
-        // Seed from mock data
         await base44.entities.DispatchLog.bulkCreate(DISPATCH_LOGS.map(d => ({
-          school_id: d.school_id,
-          school_name: d.school_name,
-          district: d.district,
-          trigger_type: d.trigger_type,
-          trigger_value: d.trigger_value,
-          supplies: d.supplies,
-          status: d.status,
-          xai_reason: d.xai_reason,
-          morbidity_forecast: d.morbidity_forecast,
-          priority: d.priority,
-          dispatched_by: d.dispatched_by,
+          school_id: d.school_id, school_name: d.school_name, district: d.district,
+          trigger_type: d.trigger_type, trigger_value: d.trigger_value, supplies: d.supplies,
+          status: d.status, xai_reason: d.xai_reason, morbidity_forecast: d.morbidity_forecast,
+          priority: d.priority, dispatched_by: d.dispatched_by,
         })));
         return base44.entities.DispatchLog.list('-created_date', 50);
       }
@@ -169,10 +221,31 @@ export default function DispatchLog() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dispatchLogs'] }),
   });
 
+  const handleToggleSelect = (id) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map(d => d.id)));
+    }
+  };
+
+  const handleBulkDispatch = async (ids) => {
+    const dispatchedBy = `Health Worker · ${new Date().toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT`;
+    await Promise.all(ids.map(id => updateMutation.mutateAsync({ id, data: { status: 'Dispatched', dispatched_by: dispatchedBy } })));
+  };
+
   const statusFilters = ['All', 'Pending', 'Dispatched', 'Delivered'];
   const filtered = filter === 'All' ? dbLogs : dbLogs.filter(d => d.status === filter);
-
   const countByStatus = (s) => dbLogs.filter(d => d.status === s).length;
+  const allSelected = filtered.length > 0 && selected.size === filtered.length;
 
   if (!isAdmin) {
     return (
@@ -199,9 +272,7 @@ export default function DispatchLog() {
           <Truck className="w-6 h-6" />
           <h2 className="text-[18px] font-bold">Anticipatory Action Dispatch Log</h2>
         </div>
-        <p className="text-orange-100 text-[13px]">
-          Admin View · Supply chain management · Sentinel Engine auto-dispatches
-        </p>
+        <p className="text-orange-100 text-[13px]">Admin View · Supply chain management · Sentinel Engine auto-dispatches</p>
         <div className="flex flex-wrap gap-3 mt-3">
           {[
             { label: 'Total Orders', value: dbLogs.length },
@@ -217,17 +288,34 @@ export default function DispatchLog() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Filters + Select All */}
+      <div className="flex flex-wrap items-center gap-2">
         {statusFilters.map(f => (
-          <button key={f} onClick={() => setFilter(f)}
+          <button key={f} onClick={() => { setFilter(f); setSelected(new Set()); }}
             className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
               filter === f ? 'bg-[#1B4F72] text-white' : 'bg-white text-muted-foreground border border-border hover:border-[#1B4F72]'
             }`}>
             {f}
           </button>
         ))}
+        <button
+          onClick={handleSelectAll}
+          className="ml-auto flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-medium bg-white border border-border hover:border-[#1B4F72] text-muted-foreground transition-all"
+        >
+          {allSelected ? <CheckSquare className="w-4 h-4 text-[#1B4F72]" /> : <Square className="w-4 h-4" />}
+          {allSelected ? 'Deselect All' : 'Select All'}
+        </button>
       </div>
+
+      {/* Bulk dispatch bar */}
+      {selected.size > 0 && (
+        <BulkDispatchBar
+          selected={selected}
+          dispatches={dbLogs}
+          onBulkDispatch={handleBulkDispatch}
+          onClear={() => setSelected(new Set())}
+        />
+      )}
 
       {/* Cards */}
       {isLoading ? (
@@ -238,6 +326,8 @@ export default function DispatchLog() {
             <DispatchCard
               key={dispatch.id}
               dispatch={dispatch}
+              selected={selected.has(dispatch.id)}
+              onToggleSelect={handleToggleSelect}
               onStatusChange={(id, data) => updateMutation.mutateAsync({ id, data })}
             />
           ))}

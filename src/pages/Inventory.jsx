@@ -5,7 +5,7 @@ import { DISPATCH_LOGS } from '@/lib/schpData';
 import { useAdminAuth } from '@/lib/authContext';
 import {
   Package, AlertTriangle, CheckCircle, Plus, Minus, Lock,
-  TrendingDown, RefreshCw, ShoppingCart, Info
+  ShoppingCart, Info, Search, X
 } from 'lucide-react';
 
 // Default inventory items (seeded on first load)
@@ -146,6 +146,7 @@ function DispatchStockCheck() {
 
 export default function Inventory() {
   const { isAdmin, login } = useAdminAuth();
+  const [search, setSearch] = useState('');
   const queryClient = useQueryClient();
 
   const { data: inventory = [], isLoading } = useQuery({
@@ -191,6 +192,11 @@ export default function Inventory() {
 
   const lowCount = inventory.filter(i => i.stock <= i.min_stock).length;
   const critCount = inventory.filter(i => i.stock <= (i.min_stock * 0.5)).length;
+  const filtered = inventory.filter(i => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return i.item_name?.toLowerCase().includes(q) || i.category?.toLowerCase().includes(q);
+  });
 
   return (
     <div className="p-4 md:p-6 space-y-5 animate-fade-in">
@@ -216,6 +222,23 @@ export default function Inventory() {
         </div>
       </div>
 
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <input
+          type="text"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search by supply name or category…"
+          className="w-full pl-9 pr-9 py-2.5 border border-border rounded-xl text-[13px] focus:outline-none focus:border-[#1B4F72] bg-white shadow-sm"
+        />
+        {search && (
+          <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
       {/* Low stock alert */}
       {critCount > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
@@ -234,7 +257,12 @@ export default function Inventory() {
             <div className="text-center py-10 text-muted-foreground text-[13px]">Loading inventory...</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {inventory.map(item => (
+              {filtered.length === 0 && (
+                <div className="col-span-2 text-center py-8 text-muted-foreground text-[13px]">
+                  No supplies match "<span className="font-semibold">{search}</span>"
+                </div>
+              )}
+              {filtered.map(item => (
                 <InventoryCard key={item.id} item={item} onAdjust={handleAdjust} />
               ))}
             </div>

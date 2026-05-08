@@ -12,23 +12,37 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
 
-// Generate 14-day history for a school (deterministic)
-function generateHistory(schoolId, currentReading) {
+// Generate history for a school over a given number of days (deterministic)
+function generateHistory(schoolId, currentReading, days = 14) {
   const seed = schoolId.charCodeAt(1);
   const data = [];
-  for (let i = 13; i >= 0; i--) {
-    const date = new Date('2026-05-05');
-    date.setDate(date.getDate() - i);
-    const label = date.toLocaleDateString('en-UG', { day: 'numeric', month: 'short' });
+  // For year view, aggregate into weekly points
+  const points = days > 90 ? Math.round(days / 7) : days;
+  const step = days > 90 ? 7 : 1;
+  for (let i = points - 1; i >= 0; i--) {
+    const date = new Date('2026-05-08');
+    date.setDate(date.getDate() - i * step);
+    const label = days > 90
+      ? date.toLocaleDateString('en-UG', { day: 'numeric', month: 'short' })
+      : days > 14
+        ? date.toLocaleDateString('en-UG', { day: 'numeric', month: 'short' })
+        : date.toLocaleDateString('en-UG', { weekday: 'short', day: 'numeric' });
     const noise = Math.sin(i * seed) * 20 + Math.cos(i * 1.3) * 10;
     const base = currentReading ? currentReading.pm25 : 80;
     const heatBase = currentReading ? currentReading.heat_index : 35;
-    const pm25 = Math.max(15, Math.round(base * 0.6 + (13 - i) * 3 + noise));
-    const heatIndex = parseFloat((heatBase * 0.8 + (13 - i) * 0.3 + Math.sin(i * 0.5) * 1.5).toFixed(1));
+    const dayFactor = (points - 1 - i) / (points - 1);
+    const pm25 = Math.max(15, Math.round(base * 0.5 + dayFactor * base * 0.6 + noise));
+    const heatIndex = parseFloat((heatBase * 0.75 + dayFactor * heatBase * 0.3 + Math.sin(i * 0.5) * 1.5).toFixed(1));
     data.push({ date: label, pm25, heatIndex });
   }
   return data;
 }
+
+const RANGE_OPTIONS = [
+  { id: 'week',  label: '7 Days',  days: 7 },
+  { id: 'month', label: '30 Days', days: 30 },
+  { id: 'year',  label: '1 Year',  days: 365 },
+];
 
 const STATUS_CONFIG = {
   Pending:    { color: 'text-yellow-700', bg: 'bg-yellow-100', icon: Clock },
@@ -61,11 +75,13 @@ function SensorGauge({ label, value, unit, icon: Icon, color, max, thresholds })
 export default function SchoolProfile() {
   const { schoolId } = useParams();
   const [historyMetric, setHistoryMetric] = useState('pm25');
+  const [historyRange, setHistoryRange] = useState('week');
 
   const school = SCHOOLS.find(s => s.id === schoolId);
   const reading = SENSOR_READINGS.find(r => r.school_id === schoolId);
   const dispatches = DISPATCH_LOGS.filter(d => d.school_id === schoolId);
-  const history = generateHistory(schoolId, reading);
+  const rangeDays = RANGE_OPTIONS.find(r => r.id === historyRange)?.days || 7;
+  const history = generateHistory(schoolId, reading, rangeDays);
 
   if (!school) {
     return (
@@ -165,17 +181,29 @@ export default function SchoolProfile() {
       <div className="bg-white rounded-xl border border-border shadow-sm p-4">
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-[14px] font-semibold text-[#1B4F72] flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" /> 14-Day Climate History
+            <TrendingUp className="w-4 h-4" /> Climate History
           </h3>
-          <div className="flex gap-1.5">
-            {[{ id: 'pm25', label: 'PM2.5' }, { id: 'heatIndex', label: 'Heat Index' }].map(m => (
-              <button key={m.id} onClick={() => setHistoryMetric(m.id)}
-                className={`px-3 py-1 rounded-lg text-[11px] font-medium transition-all ${
-                  historyMetric === m.id ? 'bg-[#1B4F72] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/70'
-                }`}>
-                {m.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex gap-1">
+              {RANGE_OPTIONS.map(r => (
+                <button key={r.id} onClick={() => setHistoryRange(r.id)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    historyRange === r.id ? 'bg-[#E67E22] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/70'
+                  }`}>
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-1">
+              {[{ id: 'pm25', label: 'PM2.5' }, { id: 'heatIndex', label: 'Heat Index' }].map(m => (
+                <button key={m.id} onClick={() => setHistoryMetric(m.id)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    historyMetric === m.id ? 'bg-[#1B4F72] text-white' : 'bg-muted text-muted-foreground hover:bg-muted/70'
+                  }`}>
+                  {m.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <ResponsiveContainer width="100%" height={200}>
@@ -187,7 +215,10 @@ export default function SchoolProfile() {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v, i) => i % 3 === 0 ? v : ''} />
+            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={(v, i) => {
+              const step = historyRange === 'year' ? 4 : historyRange === 'month' ? 5 : 1;
+              return i % step === 0 ? v : '';
+            }} />
             <YAxis tick={{ fontSize: 10 }} />
             <Tooltip contentStyle={{ fontSize: 12 }} />
             {historyMetric === 'pm25' && (
