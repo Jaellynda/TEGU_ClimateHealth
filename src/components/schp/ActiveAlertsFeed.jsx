@@ -3,57 +3,68 @@ import { Link } from 'react-router-dom';
 import { SCHOOLS, SENSOR_READINGS } from '@/lib/schpData';
 import { Wind, Thermometer, AlertTriangle, ArrowRight } from 'lucide-react';
 
+const DEFAULT_THRESHOLDS = {
+  Kampala: { pm25High: 100, pm25Critical: 150, heatHigh: 38, heatCritical: 42 },
+  Jinja: { pm25High: 95, pm25Critical: 145, heatHigh: 37, heatCritical: 41 },
+  Wakiso: { pm25High: 90, pm25Critical: 140, heatHigh: 36, heatCritical: 40 },
+  Mukono: { pm25High: 85, pm25Critical: 135, heatHigh: 35, heatCritical: 39 },
+  Entebbe: { pm25High: 80, pm25Critical: 130, heatHigh: 34, heatCritical: 38 },
+};
+
 function buildAlerts(schools, readings) {
   const readingMap = Object.fromEntries(readings.map(r => [r.school_id, r]));
+  const districtThresholds = JSON.parse(localStorage.getItem('districtThresholds')) || DEFAULT_THRESHOLDS;
   const alerts = [];
 
   schools.forEach(school => {
     const r = readingMap[school.id];
     if (!r) return;
 
-    if (r.pm25 > 150) {
+    const thresholds = districtThresholds[school.district] || DEFAULT_THRESHOLDS[school.district];
+
+    if (r.pm25 >= thresholds.pm25Critical) {
       alerts.push({
         schoolId: school.id,
         schoolName: school.name,
         district: school.district,
         type: 'air',
-        label: 'Poor Air Quality',
-        detail: `PM2.5 at ${r.pm25} μg/m³ — exceeds safe limit (150)`,
+        label: 'High Risk Air Quality',
+        detail: `PM2.5 at ${r.pm25} μg/m³ — exceeds district critical threshold (${thresholds.pm25Critical})`,
         severity: 'critical',
         icon: Wind,
       });
-    } else if (r.pm25 > 100) {
+    } else if (r.pm25 >= thresholds.pm25High) {
       alerts.push({
         schoolId: school.id,
         schoolName: school.name,
         district: school.district,
         type: 'air',
-        label: 'Elevated PM2.5',
-        detail: `PM2.5 at ${r.pm25} μg/m³ — approaching danger threshold`,
+        label: 'High Risk Air Quality',
+        detail: `PM2.5 at ${r.pm25} μg/m³ — exceeds district high risk threshold (${thresholds.pm25High})`,
         severity: 'warning',
         icon: Wind,
       });
     }
 
-    if (r.heat_index > 42) {
+    if (r.heat_index >= thresholds.heatCritical) {
       alerts.push({
         schoolId: school.id,
         schoolName: school.name,
         district: school.district,
         type: 'heat',
-        label: 'Extreme Heat Index',
-        detail: `Heat index at ${r.heat_index}°C — heatstroke risk for children`,
+        label: 'High Risk Heat',
+        detail: `Heat index at ${r.heat_index}°C — exceeds district critical threshold (${thresholds.heatCritical}°C)`,
         severity: 'critical',
         icon: Thermometer,
       });
-    } else if (r.heat_index > 38) {
+    } else if (r.heat_index >= thresholds.heatHigh) {
       alerts.push({
         schoolId: school.id,
         schoolName: school.name,
         district: school.district,
         type: 'heat',
-        label: 'High Heat Index',
-        detail: `Heat index at ${r.heat_index}°C — dehydration risk elevated`,
+        label: 'High Risk Heat',
+        detail: `Heat index at ${r.heat_index}°C — exceeds district high risk threshold (${thresholds.heatHigh}°C)`,
         severity: 'warning',
         icon: Thermometer,
       });

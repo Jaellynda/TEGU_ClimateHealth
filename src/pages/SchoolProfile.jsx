@@ -11,6 +11,7 @@ import {
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from 'recharts';
+import PM25Comparison from '@/components/schp/PM25Comparison';
 
 // Generate history for a school over a given number of days (deterministic)
 function generateHistory(schoolId, currentReading, days = 14) {
@@ -176,6 +177,9 @@ export default function SchoolProfile() {
           No sensor installed at this school · Planned deployment Q3 2026
         </div>
       )}
+
+      {/* PM2.5 Year-over-Year Comparison */}
+      <PM25Comparison schoolId={schoolId} schoolName={school.name} />
 
       {/* 14-day climate history chart */}
       <div className="bg-white rounded-xl border border-border shadow-sm p-4">

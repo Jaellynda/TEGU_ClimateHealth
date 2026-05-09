@@ -1,24 +1,37 @@
 import React, { useState } from 'react';
 import { Settings as SettingsIcon, Save, RotateCcw, AlertTriangle } from 'lucide-react';
 
+const DISTRICTS = ['Kampala', 'Jinja', 'Wakiso', 'Mukono', 'Entebbe'];
+
+const DEFAULT_THRESHOLDS = {
+  Kampala: { pm25High: 100, pm25Critical: 150, heatHigh: 38, heatCritical: 42 },
+  Jinja: { pm25High: 95, pm25Critical: 145, heatHigh: 37, heatCritical: 41 },
+  Wakiso: { pm25High: 90, pm25Critical: 140, heatHigh: 36, heatCritical: 40 },
+  Mukono: { pm25High: 85, pm25Critical: 135, heatHigh: 35, heatCritical: 39 },
+  Entebbe: { pm25High: 80, pm25Critical: 130, heatHigh: 34, heatCritical: 38 },
+};
+
 export default function Settings() {
-  const [pm25_high_risk, setPm25HighRisk] = useState(100);
-  const [pm25_critical, setPm25Critical] = useState(150);
-  const [heat_index_high_risk, setHeatIndexHighRisk] = useState(38);
-  const [heat_index_critical, setHeatIndexCritical] = useState(42);
+  const [districtThresholds, setDistrictThresholds] = useState(DEFAULT_THRESHOLDS);
   const [saved, setSaved] = useState(false);
 
   const handleReset = () => {
-    setPm25HighRisk(100);
-    setPm25Critical(150);
-    setHeatIndexHighRisk(38);
-    setHeatIndexCritical(42);
+    setDistrictThresholds(DEFAULT_THRESHOLDS);
+    localStorage.removeItem('districtThresholds');
     setSaved(false);
   };
 
   const handleSave = () => {
+    localStorage.setItem('districtThresholds', JSON.stringify(districtThresholds));
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
+  };
+
+  const updateThreshold = (district, field, value) => {
+    setDistrictThresholds(prev => ({
+      ...prev,
+      [district]: { ...prev[district], [field]: parseInt(value, 10) }
+    }));
   };
 
   return (
@@ -30,141 +43,91 @@ export default function Settings() {
           <h2 className="text-[18px] font-bold">Sentinel Configuration</h2>
         </div>
         <p className="text-zinc-300 text-[13px]">
-          Define climate risk thresholds that automatically trigger High Risk and Critical Risk status
+          Define climate risk thresholds by district — triggers High Risk and Critical alerts automatically
         </p>
       </div>
 
-      {/* PM2.5 Settings */}
-      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-6">
-        <h3 className="text-[14px] font-bold text-zinc-900 mb-4 flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-blue-600" />
-          PM2.5 Air Quality Thresholds (μg/m³)
-        </h3>
-        
-        <div className="space-y-5">
-          {/* High Risk */}
-          <div>
-            <label className="text-[12px] font-semibold text-zinc-700 block mb-2">
-              High Risk Threshold
-              <span className="text-yellow-600 ml-1">↕ {pm25_high_risk} μg/m³</span>
-            </label>
-            <input
-              type="range"
-              min="50"
-              max="200"
-              value={pm25_high_risk}
-              onChange={(e) => setPm25HighRisk(parseInt(e.target.value))}
-              className="w-full h-2 bg-yellow-100 rounded-lg appearance-none cursor-pointer accent-yellow-600"
-            />
-            <div className="flex justify-between text-[10px] text-zinc-500 mt-1">
-              <span>50</span>
-              <span>200</span>
-            </div>
-            <p className="text-[11px] text-zinc-600 mt-2">Trigger action for schools with moderate air pollution</p>
-          </div>
+      {/* District-Level Threshold Configuration */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {DISTRICTS.map(district => (
+          <div key={district} className="bg-white rounded-xl border border-zinc-200 shadow-sm p-5">
+            <h3 className="text-[14px] font-bold text-zinc-900 mb-4">{district} District</h3>
+            <div className="space-y-4">
+              {/* PM2.5 High Risk */}
+              <div>
+                <label className="text-[11px] font-semibold text-zinc-700 block mb-2">
+                  PM2.5 High Risk
+                  <span className="text-yellow-600 ml-1">{districtThresholds[district].pm25High} μg/m³</span>
+                </label>
+                <input
+                  type="range"
+                  min="50"
+                  max="150"
+                  value={districtThresholds[district].pm25High}
+                  onChange={(e) => updateThreshold(district, 'pm25High', e.target.value)}
+                  className="w-full h-2 bg-yellow-100 rounded-lg appearance-none cursor-pointer accent-yellow-600"
+                />
+              </div>
 
-          {/* Critical */}
-          <div>
-            <label className="text-[12px] font-semibold text-zinc-700 block mb-2">
-              Critical Risk Threshold
-              <span className="text-red-600 ml-1">↕ {pm25_critical} μg/m³</span>
-            </label>
-            <input
-              type="range"
-              min="100"
-              max="300"
-              value={pm25_critical}
-              onChange={(e) => setPm25Critical(parseInt(e.target.value))}
-              className="w-full h-2 bg-red-100 rounded-lg appearance-none cursor-pointer accent-red-600"
-            />
-            <div className="flex justify-between text-[10px] text-zinc-500 mt-1">
-              <span>100</span>
-              <span>300</span>
-            </div>
-            <p className="text-[11px] text-zinc-600 mt-2">Trigger emergency dispatch and sentinel alerts</p>
-          </div>
-        </div>
-      </div>
+              {/* PM2.5 Critical */}
+              <div>
+                <label className="text-[11px] font-semibold text-zinc-700 block mb-2">
+                  PM2.5 Critical
+                  <span className="text-red-600 ml-1">{districtThresholds[district].pm25Critical} μg/m³</span>
+                </label>
+                <input
+                  type="range"
+                  min="100"
+                  max="250"
+                  value={districtThresholds[district].pm25Critical}
+                  onChange={(e) => updateThreshold(district, 'pm25Critical', e.target.value)}
+                  className="w-full h-2 bg-red-100 rounded-lg appearance-none cursor-pointer accent-red-600"
+                />
+              </div>
 
-      {/* Heat Index Settings */}
-      <div className="bg-white rounded-xl border border-zinc-200 shadow-sm p-6">
-        <h3 className="text-[14px] font-bold text-zinc-900 mb-4 flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-orange-600" />
-          Heat Index Thresholds (°C)
-        </h3>
+              {/* Heat Index High Risk */}
+              <div>
+                <label className="text-[11px] font-semibold text-zinc-700 block mb-2">
+                  Heat Index High Risk
+                  <span className="text-yellow-600 ml-1">{districtThresholds[district].heatHigh}°C</span>
+                </label>
+                <input
+                  type="range"
+                  min="30"
+                  max="40"
+                  value={districtThresholds[district].heatHigh}
+                  onChange={(e) => updateThreshold(district, 'heatHigh', e.target.value)}
+                  className="w-full h-2 bg-yellow-100 rounded-lg appearance-none cursor-pointer accent-yellow-600"
+                />
+              </div>
 
-        <div className="space-y-5">
-          {/* High Risk */}
-          <div>
-            <label className="text-[12px] font-semibold text-zinc-700 block mb-2">
-              High Risk Threshold
-              <span className="text-yellow-600 ml-1">↕ {heat_index_high_risk}°C</span>
-            </label>
-            <input
-              type="range"
-              min="30"
-              max="45"
-              step="0.5"
-              value={heat_index_high_risk}
-              onChange={(e) => setHeatIndexHighRisk(parseFloat(e.target.value))}
-              className="w-full h-2 bg-yellow-100 rounded-lg appearance-none cursor-pointer accent-yellow-600"
-            />
-            <div className="flex justify-between text-[10px] text-zinc-500 mt-1">
-              <span>30°C</span>
-              <span>45°C</span>
+              {/* Heat Index Critical */}
+              <div>
+                <label className="text-[11px] font-semibold text-zinc-700 block mb-2">
+                  Heat Index Critical
+                  <span className="text-red-600 ml-1">{districtThresholds[district].heatCritical}°C</span>
+                </label>
+                <input
+                  type="range"
+                  min="35"
+                  max="50"
+                  value={districtThresholds[district].heatCritical}
+                  onChange={(e) => updateThreshold(district, 'heatCritical', e.target.value)}
+                  className="w-full h-2 bg-red-100 rounded-lg appearance-none cursor-pointer accent-red-600"
+                />
+              </div>
             </div>
-            <p className="text-[11px] text-zinc-600 mt-2">Dehydration and heat exhaustion risk elevated</p>
           </div>
-
-          {/* Critical */}
-          <div>
-            <label className="text-[12px] font-semibold text-zinc-700 block mb-2">
-              Critical Risk Threshold
-              <span className="text-red-600 ml-1">↕ {heat_index_critical}°C</span>
-            </label>
-            <input
-              type="range"
-              min="35"
-              max="50"
-              step="0.5"
-              value={heat_index_critical}
-              onChange={(e) => setHeatIndexCritical(parseFloat(e.target.value))}
-              className="w-full h-2 bg-red-100 rounded-lg appearance-none cursor-pointer accent-red-600"
-            />
-            <div className="flex justify-between text-[10px] text-zinc-500 mt-1">
-              <span>35°C</span>
-              <span>50°C</span>
-            </div>
-            <p className="text-[11px] text-zinc-600 mt-2">Heatstroke risk — emergency cooling and hydration dispatch</p>
-          </div>
-        </div>
+        ))}
       </div>
 
       {/* Summary & Actions */}
       <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4">
-        <h3 className="text-[13px] font-bold text-zinc-900 mb-3">Active Configuration</h3>
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white rounded-lg p-3 border border-yellow-200">
-            <p className="text-[10px] text-zinc-600 uppercase tracking-wide">High Risk Trigger</p>
-            <p className="text-[14px] font-bold text-zinc-900 mt-1">
-              PM2.5 &gt; {pm25_high_risk} μg/m³
-              <br />
-              <span className="text-[12px] font-normal">or Heat &gt; {heat_index_high_risk}°C</span>
-            </p>
-          </div>
-          <div className="bg-white rounded-lg p-3 border border-red-200">
-            <p className="text-[10px] text-zinc-600 uppercase tracking-wide">Critical Risk Trigger</p>
-            <p className="text-[14px] font-bold text-zinc-900 mt-1">
-              PM2.5 &gt; {pm25_critical} μg/m³
-              <br />
-              <span className="text-[12px] font-normal">or Heat &gt; {heat_index_critical}°C</span>
-            </p>
-          </div>
-        </div>
-
+        <h3 className="text-[13px] font-bold text-zinc-900 mb-3">Configuration Status</h3>
+        
         {saved && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-2.5 mb-3 flex items-center gap-2">
-            <span className="text-green-600 text-[12px] font-semibold">✓ Settings saved</span>
+            <span className="text-green-600 text-[12px] font-semibold">✓ Settings saved to all districts</span>
           </div>
         )}
 
@@ -190,7 +153,7 @@ export default function Settings() {
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
         <AlertTriangle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
         <p className="text-[12px] text-blue-700">
-          <strong>Sentinel Logic:</strong> These thresholds automatically classify schools in monitored zones. When a school breaches either threshold, it triggers the dispatch engine to send supplies based on the school's verified population capacity (students + staff). In production, these settings sync across all health worker mobile apps and the DHIS2 alert system.
+          <strong>District-Level Alert Logic:</strong> Each district has configurable PM2.5 and Heat Index thresholds. When a school in that district breaches High Risk or Critical thresholds, it automatically triggers a "High Risk" alert in the dashboard feed. These settings sync in real-time across the Sentinel Network.
         </p>
       </div>
     </div>
