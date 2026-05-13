@@ -30,6 +30,21 @@ export default function AppLayout() {
           title={meta.title}
           subtitle={meta.subtitle}
         />
+        <div style={{
+          background: "#1a1a00",
+          border: "1px solid #eab308",
+          borderLeft: "4px solid #eab308",
+          padding: "6px 16px",
+          fontFamily: "monospace",
+          fontSize: 11,
+          color: "#eab308",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexShrink: 0,
+        }}>
+          ⚠ PROTOTYPE — Simulated sensor data. Target schools identified for Phase 1 deployment pending partnerships.
+        </div>
         <main className="flex-1 overflow-y-auto">
           <AlertBanner />
           <Outlet />
