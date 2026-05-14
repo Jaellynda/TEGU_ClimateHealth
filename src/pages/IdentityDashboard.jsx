@@ -5,6 +5,7 @@ import {
   RefreshCw, ShieldCheck, Flame
 } from 'lucide-react';
 import { SCHOOLS, SENSOR_READINGS, getPM25Level, getVulnerabilityColor } from '@/lib/schpData';
+import SensorStalenessAlert from '@/components/schp/SensorStalenessAlert';
 
 // Reference AirQo stations (simulated)
 const AIRQO_REFERENCE = {
@@ -243,6 +244,9 @@ export default function IdentityDashboard() {
           Verify school GPS coordinates · AirQo sensor calibration · School vulnerability profiles across the Kampala–Jinja corridor
         </p>
       </div>
+
+      {/* Sensor Staleness Alerts */}
+      <SensorStalenessAlert />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
