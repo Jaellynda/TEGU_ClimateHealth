@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const NAV_IDENTITY = [
-  { path: '/identity', label: 'Verify Sentinel', icon: Shield, desc: 'Identity Module' },
+  { path: '/identity', label: 'Sentinel Network Hub', icon: Shield, desc: 'Geospatial & Sensor Health' },
 ];
 
 const NAV_CLIMATE_HEALTH = [
