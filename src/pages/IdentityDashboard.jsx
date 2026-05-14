@@ -98,11 +98,11 @@ function SchoolCard({ school, reading, selected, onToggle, verified, onVerify, v
         </div>
       </div>
 
-      {/* H3 + Sensor Row */}
+      {/* GPS + Sensor Row */}
       <div className="px-4 py-2 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <MapPin className="w-3 h-3 text-zinc-400" />
-          <span className="font-mono text-[10px] text-zinc-500">{h3id}</span>
+          <span className="font-mono text-[10px] text-zinc-500 truncate" title="GPS Grid Cell ID">{h3id}</span>
         </div>
         <SensorStatusBadge status={sensorState} />
       </div>
@@ -240,7 +240,7 @@ export default function IdentityDashboard() {
           <h2 className="text-[18px] font-bold">Sentinel Network Hub: Geospatial Verification &amp; Sensor Health</h2>
         </div>
         <p className="text-blue-200 text-[13px]">
-          Verify H3-indexed school coordinates · AirQo sensor calibration · School vulnerability profiles across the Kampala–Jinja corridor
+          Verify school GPS coordinates · AirQo sensor calibration · School vulnerability profiles across the Kampala–Jinja corridor
         </p>
       </div>
 
@@ -292,7 +292,7 @@ export default function IdentityDashboard() {
             : <Square className="w-4 h-4" />}
           Select all schools
         </button>
-        <span className="text-[11px] text-zinc-400 ml-auto">{SCHOOLS.length} sentinel nodes indexed</span>
+        <span className="text-[11px] text-zinc-400 ml-auto">{SCHOOLS.length} sentinel nodes mapped</span>
       </div>
 
       {/* School Cards Grid */}

@@ -12,7 +12,7 @@ export default function IdentityVerification() {
           <h2 className="text-[18px] font-bold">Sentinel Network Hub</h2>
         </div>
         <p className="text-blue-200 text-[13px]">
-          Geospatial Verification &amp; Sensor Health · AirQo Uganda Integration · H3-Indexed School Nodes
+          Geospatial Verification &amp; Sensor Health · AirQo Uganda Integration · GPS-Mapped School Nodes
         </p>
       </div>
 
@@ -25,7 +25,7 @@ export default function IdentityVerification() {
             <h3 className="text-[14px] font-bold text-zinc-900">Sentinel Network Manager</h3>
           </div>
           <p className="text-[12px] text-zinc-600 mb-4">
-            Verify H3-indexed geospatial coordinates, AirQo sensor calibration status, and school vulnerability profiles across all sentinel nodes.
+            Verify school GPS coordinates, AirQo sensor calibration status, and school vulnerability profiles across all sentinel nodes.
           </p>
           <Link
             to="/identity-dashboard"
@@ -57,7 +57,7 @@ export default function IdentityVerification() {
       <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3">
         <Activity className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
         <p className="text-[12px] text-emerald-700">
-          <strong>AirQo Integration Ready:</strong> Sentinel nodes are indexed via H3 resolution-9 hex grid. Sensor accuracy verification compares local node readings against the nearest AirQo reference station to ensure data integrity before dispatch triggers fire.
+          <strong>AirQo Integration Ready:</strong> Sentinel nodes are mapped using GPS grid coordinates. Sensor accuracy verification compares local node readings against the nearest AirQo reference station to ensure data integrity before dispatch triggers fire.
         </p>
       </div>
     </div>

@@ -6,7 +6,7 @@ import AppFooter from './AppFooter';
 import AlertBanner from './AlertBanner';
 
 const PAGE_META = {
-  '/identity': { title: 'Sentinel Network Hub', subtitle: 'Geospatial Verification & Sensor Health · AirQo Uganda · H3-Indexed Nodes' },
+  '/identity': { title: 'Sentinel Network Hub', subtitle: 'Geospatial Verification & Sensor Health · AirQo Uganda · GPS-Mapped Nodes' },
   '/identity-dashboard': { title: 'Sentinel Network Manager', subtitle: 'AirQo Sensor Calibration · School Vulnerability Profiles · Accuracy Verification' },
   '/': { title: 'Live Climate Risk Map', subtitle: 'Uganda · TEGU Systems · Real-time environmental monitoring across 8 sentinel schools' },
   '/sensors': { title: 'DePIN Sensor Network', subtitle: 'Distributed IoT Nodes — Kampala & Jinja Regions' },
