@@ -1,12 +1,15 @@
-# 🌍 Sentinel Climate Health
+# Sentinel Climate Health
 ### TEGU Systems Climate-Health Protocol (TSCHP)
 
 > **An open-source anticipatory climate-health monitoring platform protecting children in Uganda from climate-driven health risks.**
 
+ **Live Demo:** [climate-app.tegusystems.com (https://tegu-climatehealth.netlify.app)
+ **License:** MIT
+ **Status:** Active prototype — open source, fully self-hostable
 
 ---
 
-##  What Is This?
+## What Is SCHP?
 
 Sentinel Climate Health is a real-time climate-health monitoring dashboard built by **TEGU Systems**, a technology startup registered in Uganda. It simulates and visualises environmental sensor data — PM2.5 air quality, temperature, humidity, and heat index — across primary schools in Uganda, and generates anticipatory health alerts when conditions exceed WHO child-safety thresholds.
 
@@ -16,7 +19,7 @@ The platform is designed to help school administrators, community health workers
 
 ---
 
-##  Key Features
+## Key Features
 
 | Feature | Description |
 |---|---|
@@ -32,36 +35,11 @@ The platform is designed to help school administrators, community health workers
 
 ## Architecture
 
-### Current Architecture (Prototype Phase)
-
 ```
 ┌─────────────────────────────────────────────────────┐
 │                   FRONTEND (React)                   │
-│  Vite + React + TailwindCSS + shadcn/ui components  │
-│  Hosted via Base44 managed hosting                   │
-└────────────────────────┬────────────────────────────┘
-                         │ Base44 JavaScript SDK
-┌────────────────────────▼────────────────────────────┐
-│              BACKEND (Base44 BaaS — Prototype)       │
-│                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌───────────┐  │
-│  │   Entities   │  │  Functions   │  │   Auth    │  │
-│  │  (Database)  │  │ (Serverless) │  │ (Session) │  │
-│  └──────────────┘  └──────────────┘  └───────────┘  │
-│                                                      │
-│  Data Tables:                                        │
-│  • SensorReading   • PilotFeedback                  │
-│  • StakeholderFeedback                              │
-└─────────────────────────────────────────────────────┘
-```
-
-### Target Architecture (Open-Source Migration — Month 4 of Investment Period)
-
-```
-┌─────────────────────────────────────────────────────┐
-│                   FRONTEND (React)                   │
-│  Vite + React + TailwindCSS — unchanged              │
-│  Self-hosted or Vercel/Netlify deployment            │
+│  Vite + React + TailwindCSS + shadcn/ui              │
+│  Deployed on Netlify (free tier)                     │
 └────────────────────────┬────────────────────────────┘
                          │ Supabase JavaScript SDK
 ┌────────────────────────▼────────────────────────────┐
@@ -72,75 +50,15 @@ The platform is designed to help school administrators, community health workers
 │  │  (Database)  │  │  (Deno)      │  │  (JWT)    │  │
 │  └──────────────┘  └──────────────┘  └───────────┘  │
 │                                                      │
-│  Fully self-hostable, zero proprietary dependencies  │
+│  Fully self-hostable · Zero proprietary dependencies │
 └─────────────────────────────────────────────────────┘
 ```
 
-> **Note on current backend:** The prototype uses [Base44](https://base44.com) as a managed backend-as-a-service for rapid development and validation. The frontend React code is fully portable. During the UNICEF investment period, we will migrate the backend to **Supabase** (MIT licensed, fully open-source, self-hostable PostgreSQL) by Month 4, making the entire stack end-to-end open source with zero proprietary dependencies.
+**Full open-source stack — frontend to backend. No proprietary dependencies.**
 
 ---
 
-##  Data Schema
-
-All entities are defined as JSON schemas. Every record includes auto-generated `id`, `created_date`, `updated_date`, and `created_by` fields.
-
-### SensorReading
-Stores climate sensor readings per school, generated every 30 minutes.
-
-| Field | Type | Description |
-|---|---|---|
-| `school_id` | string | Unique school identifier |
-| `school_name` | string | Human-readable school name |
-| `pm25` | number | PM2.5 concentration in μg/m³ |
-| `temperature` | number | Ambient temperature in °C |
-| `humidity` | number | Relative humidity (%) |
-| `heat_index` | number | Calculated heat index in °C |
-| `status` | enum | `Normal` or `Alert` (WHO thresholds) |
-| `timestamp` | string | ISO 8601 timestamp of reading |
-
-**WHO Child-Safe Thresholds:**
-- PM2.5 Alert: **> 150 μg/m³**
-- Heat Index Alert: **> 39°C**
-
-### PilotFeedback
-Structured feedback from stakeholders during app demonstrations.
-
-| Field | Type | Description |
-|---|---|---|
-| `name` | string | Respondent full name |
-| `role` | enum | Teacher / Parent / School Administrator / Health Worker / Community Member / Government Officer / Other |
-| `organization` | string | School or community group |
-| `location` | string | District or community |
-| `understood_app` | enum | Yes / Mostly / No |
-| `would_be_useful` | enum | Very useful / Somewhat useful / Not sure / Not useful |
-| `most_useful_feature` | string | Most valuable feature (free text) |
-| `what_to_improve` | string | Suggestions (free text) |
-| `quote` | string | 1–2 sentence testimonial |
-| `consent_to_reference` | boolean | Permission to cite in publications |
-| `contact_email` | string | Optional contact |
-
-### StakeholderFeedback
-Extended schema for formal stakeholder demonstrations.
-
-| Field | Type | Description |
-|---|---|---|
-| `name` | string | Full name |
-| `role` | string | Title / role |
-| `organization` | string | Institution |
-| `location` | string | District |
-| `understood_app` | boolean | Understood the platform? |
-| `would_be_useful` | boolean | Would deploy at their school/org? |
-| `usefulness_reason` | string | Reasoning |
-| `what_to_improve` | string | Suggestions |
-| `quote` | string | Testimonial |
-| `consent_to_reference` | boolean | Consent for public reference |
-| `contact_email` | string | Optional |
-| `contact_phone` | string | Optional |
-| `demo_date` | string | YYYY-MM-DD |
-
----
-
-##  Tech Stack
+## Tech Stack
 
 | Layer | Technology | License |
 |---|---|---|
@@ -148,40 +66,59 @@ Extended schema for formal stakeholder demonstrations.
 | Build Tool | Vite | MIT |
 | Styling | TailwindCSS | MIT |
 | UI Components | shadcn/ui | MIT |
-| Backend (prototype) | Base44 BaaS | Proprietary (managed, prototype only) |
-| Backend (target) | Supabase | MIT / Apache 2.0 |
+| Backend | Supabase (PostgreSQL) | MIT / Apache 2.0 |
 | Sensor Simulation | Custom JavaScript | MIT (this repo) |
-| Deployment (prototype) | Base44 Hosting | — |
-| Deployment (target) | Vercel / Netlify / self-hosted | — |
+| Deployment | Netlify / self-hostable | — |
 
 ---
 
-## Project Structure
+## Data Schema
 
-```
-TEGU_ClimateHealth/
-├── src/
-│   ├── api/           # Base44 SDK entity bindings (to be replaced with Supabase client)
-│   ├── components/    # Reusable React UI components
-│   ├── hooks/         # Custom React hooks
-│   ├── lib/           # Utility functions, WHO threshold logic
-│   ├── pages/         # App page views (Dashboard, Schools, Alerts, Feedback)
-│   ├── utils/         # Sensor simulation logic, heat index calculations
-│   ├── App.jsx        # Root app component with routing
-│   ├── index.css      # Global styles (dark terminal aesthetic)
-│   └── main.jsx       # App entry point
-├── base44/            # Base44 platform configuration
-├── entities/          # JSON schema definitions for all data tables
-│   ├── SensorReading.json
-│   ├── PilotFeedback.json
-│   └── StakeholderFeedback.json
-├── functions/         # Serverless backend functions (sensor simulation engine)
-├── index.html
-├── package.json
-├── tailwind.config.js
-├── vite.config.js
-└── LICENSE            # MIT License
-```
+All tables are defined in Supabase PostgreSQL with Row Level Security enabled and public read access for sensor data.
+
+### sensor_readings
+Stores climate sensor readings per school, generated every 30 minutes.
+
+| Field | Type | Description |
+|---|---|---|
+| `school_id` | text | Unique school identifier |
+| `school_name` | text | Human-readable school name |
+| `pm25` | float | PM2.5 concentration in μg/m³ |
+| `temperature` | float | Ambient temperature in °C |
+| `humidity` | float | Relative humidity (%) |
+| `heat_index` | float | Calculated heat index in °C |
+| `status` | text | `Normal` or `Alert` (WHO thresholds) |
+| `timestamp` | timestamptz | ISO 8601 timestamp of reading |
+| `created_at` | timestamptz | Auto-generated record timestamp |
+
+**WHO Child-Safe Thresholds:**
+- PM2.5 Alert: **> 150 μg/m³**
+- Heat Index Alert: **> 39°C**
+
+### dispatch_logs
+Records anticipatory medical supply dispatches triggered by sensor alerts.
+
+| Field | Type | Description |
+|---|---|---|
+| `school_id` | text | Target school |
+| `trigger_type` | text | Alert type (pm25 / heat_index) |
+| `trigger_value` | float | Sensor reading that triggered dispatch |
+| `supplies` | text[] | Array of supplies dispatched |
+| `status` | text | Dispatch status |
+| `xai_reason` | text | Explainable AI reasoning |
+| `priority` | text | Dispatch priority level |
+
+### inventory
+Tracks medical supply inventory levels across dispatch hubs.
+
+| Field | Type | Description |
+|---|---|---|
+| `item_name` | text | Supply item name |
+| `category` | text | Supply category |
+| `unit` | text | Unit of measurement |
+| `stock` | float | Current stock level |
+| `min_stock` | float | Minimum threshold |
+| `unit_cost` | float | Cost per unit |
 
 ---
 
@@ -190,7 +127,7 @@ TEGU_ClimateHealth/
 ### Prerequisites
 - Node.js 18+
 - npm
-- Base44 account (prototype) — or substitute Supabase credentials
+- Supabase account (free tier)
 
 ### Setup
 
@@ -202,8 +139,8 @@ npm install
 
 Create `.env.local`:
 ```env
-VITE_BASE44_APP_ID=your_app_id
-VITE_BASE44_APP_BASE_URL=https://your-app.base44.app
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ```bash
@@ -211,21 +148,45 @@ npm run dev
 # App runs at http://localhost:5173
 ```
 
+### Supabase Tables
+Run the SQL in `/supabase/schema.sql` in your Supabase SQL editor to create all required tables with RLS policies.
+
 ---
 
-##  Roadmap & Open-Source Migration Plan
+## Project Structure
+
+```
+TEGU_ClimateHealth/
+├── src/
+│   ├── api/           # Supabase client bindings
+│   ├── components/    # Reusable React UI components
+│   ├── hooks/         # Custom React hooks
+│   ├── lib/           # Supabase client, utility functions, WHO threshold logic
+│   ├── pages/         # App page views (Dashboard, Schools, Alerts, Feedback)
+│   └── App.jsx        # Root app component with routing
+├── index.html
+├── package.json
+├── tailwind.config.js
+├── vite.config.js
+└── LICENSE            # MIT License
+```
+
+---
+
+## Roadmap
 
 | Milestone | Timeline | Status |
 |---|---|---|
 | Frontend source code open-sourced on GitHub | May 2026 | ✅ Complete |
-| Data schemas publicly documented | May 2026 | ✅ Complete |
 | MIT License applied | May 2026 | ✅ Complete |
-| Pilot feedback from 3–5 stakeholders | May–June 2026 | 🔄 In Progress |
-| Backend migration: Base44 → Supabase | Month 3–4 of investment period | 📅 Planned |
-| Full end-to-end open-source stack | Month 4 of investment period | 📅 Planned |
-| Real IoT sensor integration (low-cost PM2.5 sensors) | Month 6–9 | 📅 Planned |
-| Expansion to 20+ schools across Uganda | Month 6–12 | 📅 Planned |
-| Public API for third-party health data consumers | Month 9–12 | 📅 Planned |
+| Data schemas publicly documented | May 2026 | ✅ Complete |
+| Backend migration: Base44 → Supabase (full open source) | May 2026 | ✅ Complete |
+| Live public deployment on Netlify | May 2026 | ✅ Complete |
+| Pilot feedback | May–June 2026 | 🔄 In Progress |
+| Real IoT sensor integration (low-cost PM2.5 sensors) | Month 6–9 | Planned |
+| Expansion to 30+ schools across Uganda | Month 6–12 |  Planned |
+| Public API for third-party health data consumers | Month 9–12 |  Planned |
+| Edge deployment for low-connectivity environments | Month 9–12 |  Planned |
 
 ---
 
@@ -236,12 +197,14 @@ Sentinel Climate Health is committed to becoming a **Digital Public Good** as de
 - **Software license:** MIT
 - **Data schemas:** CC-BY 4.0
 - **Design assets:** CC-BY 4.0
-- **Backend migration target:** Supabase (MIT/Apache 2.0) — fully self-hostable, zero vendor lock-in
-- **UNICEF open-source mentorship:** We welcome guidance from the UNICEF Venture Fund open-source team on the most appropriate licensing structure during the investment period.
+- **Backend:** Supabase (MIT/Apache 2.0) — fully self-hostable, zero vendor lock-in
+- **Publicly accessible real-time data:** sensor readings are publicly readable via Supabase RLS policies
+
+Anyone can clone this repository, point it at their own Supabase instance, and run a fully independent deployment with no dependency on TEGU Systems infrastructure.
 
 ---
 
-##  Monitored Schools (Prototype)
+## Monitored Schools (Prototype)
 
 Simulated sensor coverage across 5 districts in Uganda:
 
@@ -257,21 +220,21 @@ Simulated sensor coverage across 5 districts in Uganda:
 
 ## About TEGU Systems
 
-**TEGU Systems** is a technology startup registered in Uganda, building AI-powered data infrastructure for East & Central Africa.
+**TEGU Systems** is a technology startup registered in Uganda, building geospatial data infrastructure and climate-health intelligence for East & Central Africa.
 
 **Founded by:** Jael Tegulwa — M.Sc. Data Analytics Engineering, BBA Finance
 
 **Products:**
-- **Sentinel Climate Health** — Climate-health monitoring for schools 
+- **Sentinel Climate Health** — Climate-health monitoring for schools
 - **Verify Sentinel** — Geospatial KYC and digital identity verification for East & Central Africa
 
-📧 info@[tegusystems.com](https://tegusystems.com)
-🌐 [[www.tegusystems.com](https://www.tegusystems.com)](https://www.tegusystems.com)
+📧 info@tegusystems.com
+🌐 [www.tegusystems.com](https://www.tegusystems.com)
 📍 Kampala, Uganda
 
 ---
 
-##  License
+## License
 
 This project is licensed under the **MIT License** — see the [LICENSE](./LICENSE) file for details.
 
