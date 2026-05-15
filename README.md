@@ -3,7 +3,7 @@
 
 > **An open-source anticipatory climate-health monitoring platform protecting children in Uganda from climate-driven health risks.**
 
- **Live Demo:** [https://climate-app.tegusystems.com / (https://tegu-climatehealth.netlify.app)
+ **Live Demo:** [https://climate-app.tegusystems.com )]
  **License:** MIT
  **Status:** Active prototype — open source, fully self-hostable
 
