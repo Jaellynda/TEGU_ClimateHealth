@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DISPATCH_LOGS } from '@/lib/schpData';
 import { useAdminAuth } from '@/lib/authContext';
@@ -134,8 +134,8 @@ function DispatchCard({ dispatch, onStatusChange, selected, onToggleSelect }) {
           <div className="text-[11px] text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 pt-1">
             <span>ID: <code className="bg-muted px-1 rounded font-mono">{dispatch.id?.toUpperCase()}</code></span>
             <span>By: {dispatch.dispatched_by}</span>
-            {dispatch.created_date && (
-              <span>Created: {new Date(dispatch.created_date).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
+            {dispatch.created_at && (
+              <span>Created: {new Date(dispatch.created_at).toLocaleString('en-UG', { timeZone: 'Africa/Kampala' })} EAT</span>
             )}
           </div>
         </div>
@@ -149,7 +149,6 @@ function BulkDispatchBar({ selected, dispatches, onBulkDispatch, onClear }) {
   const selectedDispatches = dispatches.filter(d => selected.has(d.id));
   const pendingCount = selectedDispatches.filter(d => d.status === 'Pending').length;
 
-  // Merge all unique supplies across selected
   const allSupplies = [...new Set(selectedDispatches.flatMap(d => d.supplies || []))];
 
   const handle = async () => {
@@ -202,22 +201,42 @@ export default function DispatchLog() {
   const { data: dbLogs = [], isLoading } = useQuery({
     queryKey: ['dispatchLogs'],
     queryFn: async () => {
-      const existing = await base44.entities.DispatchLog.list('-created_date', 50);
+      const { data: existing, error } = await supabase
+        .from('dispatch_logs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+
       if (existing.length === 0) {
-        await base44.entities.DispatchLog.bulkCreate(DISPATCH_LOGS.map(d => ({
-          school_id: d.school_id, school_name: d.school_name, district: d.district,
-          trigger_type: d.trigger_type, trigger_value: d.trigger_value, supplies: d.supplies,
-          status: d.status, xai_reason: d.xai_reason, morbidity_forecast: d.morbidity_forecast,
-          priority: d.priority, dispatched_by: d.dispatched_by,
-        })));
-        return base44.entities.DispatchLog.list('-created_date', 50);
+        const { error: insertError } = await supabase
+          .from('dispatch_logs')
+          .insert(DISPATCH_LOGS.map(d => ({
+            school_id: d.school_id, school_name: d.school_name, district: d.district,
+            trigger_type: d.trigger_type, trigger_value: d.trigger_value, supplies: d.supplies,
+            status: d.status, xai_reason: d.xai_reason, morbidity_forecast: d.morbidity_forecast,
+            priority: d.priority, dispatched_by: d.dispatched_by,
+          })));
+        if (insertError) throw insertError;
+
+        const { data: seeded, error: fetchError } = await supabase
+          .from('dispatch_logs')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50);
+        if (fetchError) throw fetchError;
+        return seeded;
       }
+
       return existing;
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.DispatchLog.update(id, data),
+    mutationFn: async ({ id, data }) => {
+      const { error } = await supabase.from('dispatch_logs').update(data).eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dispatchLogs'] }),
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '@/lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DISPATCH_LOGS } from '@/lib/schpData';
 import { useAdminAuth } from '@/lib/authContext';
@@ -8,7 +8,6 @@ import {
   ShoppingCart, Info, Search, X
 } from 'lucide-react';
 
-// Default inventory items (seeded on first load)
 const DEFAULT_INVENTORY = [
   { item_name: 'Pediatric N95 Masks', category: 'Respiratory', unit: 'units', stock: 1200, min_stock: 300, unit_cost: 0.85 },
   { item_name: 'Salbutamol Inhalers', category: 'Respiratory', unit: 'units', stock: 180, min_stock: 80, unit_cost: 4.50 },
@@ -80,7 +79,6 @@ function InventoryCard({ item, onAdjust }) {
 
       <StockBar stock={item.stock} min_stock={item.min_stock} max={item.stock * 1.5 + item.min_stock * 2} />
 
-      {/* Adjust stock */}
       <div className="flex items-center gap-2 mt-3">
         <input
           type="number"
@@ -108,8 +106,6 @@ function InventoryCard({ item, onAdjust }) {
 }
 
 function DispatchStockCheck() {
-  // Show each dispatch and whether supplies are still available
-  const readingMap = {};
   return (
     <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
       <div className="px-4 py-3 border-b border-border bg-[#1B4F72]/5">
@@ -152,17 +148,37 @@ export default function Inventory() {
   const { data: inventory = [], isLoading } = useQuery({
     queryKey: ['inventory'],
     queryFn: async () => {
-      const existing = await base44.entities.Inventory.list('-created_date', 100);
+      const { data: existing, error } = await supabase
+        .from('inventory')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (error) throw error;
+
       if (existing.length === 0) {
-        await base44.entities.Inventory.bulkCreate(DEFAULT_INVENTORY);
-        return base44.entities.Inventory.list('-created_date', 100);
+        const { error: insertError } = await supabase
+          .from('inventory')
+          .insert(DEFAULT_INVENTORY);
+        if (insertError) throw insertError;
+
+        const { data: seeded, error: fetchError } = await supabase
+          .from('inventory')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+        if (fetchError) throw fetchError;
+        return seeded;
       }
+
       return existing;
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, stock }) => base44.entities.Inventory.update(id, { stock }),
+    mutationFn: async ({ id, stock }) => {
+      const { error } = await supabase.from('inventory').update({ stock }).eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['inventory'] }),
   });
 
