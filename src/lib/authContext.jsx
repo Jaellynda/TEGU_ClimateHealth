@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// AuthProvider / useAuth — passthrough until real Supabase auth is wired up
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -14,20 +13,17 @@ export function AuthProvider({ children }) {
     navigateToLogin: () => {},
     checkUserAuth: () => {},
   };
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => useContext(AuthContext);
 
-// AdminAuthProvider / useAdminAuth — retained for Sidebar / AdminAuthProvider usage
 const AdminAuthContext = createContext(null);
 
 export function AdminAuthProvider({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const login = () => setIsAdmin(true);
   const logout = () => setIsAdmin(false);
-
   return (
     <AdminAuthContext.Provider value={{ isAdmin, login, logout }}>
       {children}
