@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAdminAuth } from '@/lib/authContext';
+import { useAdminAuth } from '@/lib/AuthContext';
 import {
   Map, Activity, AlertTriangle, Package, BarChart2,
   FileText, Shield, LogIn, LogOut, Menu, X, Wifi, Radio, TrendingUp, ShoppingCart, Lock

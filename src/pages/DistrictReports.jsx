@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DISTRICT_STATS, SCHOOLS, SENSOR_READINGS, DISPATCH_LOGS } from '@/lib/schpData';
-import { useAdminAuth } from '@/lib/authContext';
+import { useAdminAuth } from '@/lib/AuthContext';
 import { FileText, Download, CheckCircle, Clock, AlertTriangle, Lock, Database, RefreshCw, Users } from 'lucide-react';
 import jsPDF from 'jspdf';
 

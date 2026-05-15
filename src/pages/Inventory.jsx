@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DISPATCH_LOGS } from '@/lib/schpData';
-import { useAdminAuth } from '@/lib/authContext';
+import { useAdminAuth } from '@/lib/AuthContext';
 import {
   Package, AlertTriangle, CheckCircle, Plus, Minus, Lock,
   ShoppingCart, Info, Search, X
