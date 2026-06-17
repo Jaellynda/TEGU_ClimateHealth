@@ -206,7 +206,7 @@ Anyone can clone this repository, point it at their own Supabase instance, and r
 
 ## Monitored Schools (Prototype)
 
-Simulated sensor coverage across 5 districts in Uganda:
+Live sensor coverage across 5 districts in Uganda:
 
 | District | Context |
 |---|---|
